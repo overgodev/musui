@@ -1,0 +1,31 @@
+{
+  "name": "vtube-ai",
+  "version": "1.0.0",
+  "description": "VTube AI - AI Vtuber Controller with LM Studio, VTube Studio & TTS",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder"
+  },
+  "dependencies": {
+    "ws": "^8.16.0",
+    "node-fetch": "^2.7.0",
+    "say": "^0.16.0",
+    "axios": "^1.6.0"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.vtube.ai",
+    "productName": "VTube AI",
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
