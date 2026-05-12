@@ -1,0 +1,155 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: streamer
+      POSTGRES_USER: streamer
+      POSTGRES_PASSWORD: streamer
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  gateway:
+    build:
+      context: .
+      dockerfile: infra/docker/python-service.Dockerfile
+    command: uvicorn services.gateway.app.main:app --host 0.0.0.0 --port 8000
+    env_file: .env.example
+    environment:
+      SERVICE_NAME: gateway
+      SERVICE_PORT: "8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - postgres
+
+  youtube:
+    build:
+      context: .
+      dockerfile: infra/docker/python-service.Dockerfile
+    command: uvicorn services.youtube.app.main:app --host 0.0.0.0 --port 8001
+    env_file: .env.example
+    environment:
+      SERVICE_NAME: youtube
+      SERVICE_PORT: "8001"
+    ports:
+      - "8001:8001"
+    depends_on:
+      - redis
+
+  orchestrator:
+    build:
+      context: .
+      dockerfile: infra/docker/python-service.Dockerfile
+    command: uvicorn services.orchestrator.app.main:app --host 0.0.0.0 --port 8002
+    env_file: .env.example
+    environment:
+      SERVICE_NAME: orchestrator
+      SERVICE_PORT: "8002"
+    ports:
+      - "8002:8002"
+    depends_on:
+      - redis
+      - moderation
+      - persona
+      - llm-response
+      - data-logging
+
+  moderation:
+    build:
+      context: .
+      dockerfile: infra/docker/python-service.Dockerfile
+    command: uvicorn services.moderation.app.main:app --host 0.0.0.0 --port 8003
+    env_file: .env.example
+    environment:
+      SERVICE_NAME: moderation
+      SERVICE_PORT: "8003"
+    ports:
+      - "8003:8003"
+
+  persona:
+    build:
+      context: .
+      dockerfile: infra/docker/python-service.Dockerfile
+    command: uvicorn services.persona.app.main:app --host 0.0.0.0 --port 8004
+    env_file: .env.example
+    environment:
+      SERVICE_NAME: persona
+      SERVICE_PORT: "8004"
+    ports:
+      - "8004:8004"
+
+  llm-response:
+    build:
+      context: .
+      dockerfile: infra/docker/python-service.Dockerfile
+    command: uvicorn services.llm_response.app.main:app --host 0.0.0.0 --port 8005
+    env_file: .env.example
+    environment:
+      SERVICE_NAME: llm_response
+      SERVICE_PORT: "8005"
+    ports:
+      - "8005:8005"
+
+  tts:
+    build:
+      context: .
+      dockerfile: infra/docker/python-service.Dockerfile
+    command: uvicorn services.tts.app.main:app --host 0.0.0.0 --port 8006
+    env_file: .env.example
+    environment:
+      SERVICE_NAME: tts
+      SERVICE_PORT: "8006"
+    ports:
+      - "8006:8006"
+
+  avatar-bridge:
+    build:
+      context: .
+      dockerfile: infra/docker/python-service.Dockerfile
+    command: uvicorn services.avatar_bridge.app.main:app --host 0.0.0.0 --port 8007
+    env_file: .env.example
+    environment:
+      SERVICE_NAME: avatar_bridge
+      SERVICE_PORT: "8007"
+    ports:
+      - "8007:8007"
+
+  obs-bridge:
+    build:
+      context: .
+      dockerfile: infra/docker/python-service.Dockerfile
+    command: uvicorn services.obs_bridge.app.main:app --host 0.0.0.0 --port 8008
+    env_file: .env.example
+    environment:
+      SERVICE_NAME: obs_bridge
+      SERVICE_PORT: "8008"
+    ports:
+      - "8008:8008"
+
+  data-logging:
+    build:
+      context: .
+      dockerfile: infra/docker/python-service.Dockerfile
+    command: uvicorn services.data_logging.app.main:app --host 0.0.0.0 --port 8009
+    env_file: .env.example
+    environment:
+      SERVICE_NAME: data_logging
+      SERVICE_PORT: "8009"
+    ports:
+      - "8009:8009"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:

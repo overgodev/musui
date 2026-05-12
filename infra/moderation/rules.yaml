@@ -1,0 +1,65 @@
+﻿slang_map:
+  งับ: ครับ
+  มั้ย: ไหม
+  ปะ: เปล่า
+  ค้าบ: ครับ
+  ครัช: ครับ
+  เมพ: เก่ง
+
+regex_rules:
+  spam:
+    - "(.)\\1{6,}"
+    - "(ฟรี|แจก|เครดิตฟรี|รับโปร)"
+    - "(line|discord|telegram).*(ฟรี|dm|ทัก)"
+  sexual:
+    - "(18\\+|เอ็กซ์|เงี่ยน|xxx)"
+    - "(ถอด|คอลเสียว|nc)"
+  harassment:
+    - "(โง่|ควาย|อีดอก|เหี้ย)"
+    - "(ไปตาย|หุบปาก)"
+  hate:
+    - "(ชาติพันธุ์|ศาสนา).*(สกปรก|ต่ำ)"
+  self-harm:
+    - "(อยากตาย|ฆ่าตัวตาย|ทำร้ายตัวเอง)"
+  illegal:
+    - "(โกงเกม|ปั๊มวิว|ฟอกเงิน|ซื้อยา)"
+  doxxing:
+    - "(ที่อยู่|เบอร์โทร|เลขบัตร|ชื่อจริง|โรงเรียน).*"
+  impersonation-bait:
+    - "(บอกว่าเป็นคนจริง|อย่าบอกว่าเป็น ai|ปลอมเป็นคน)"
+  parasocial-bait:
+    - "(รักหนูไหม|คบกันไหม|เป็นแฟนกัน|มีแต่ฉันได้ไหม)"
+
+lexicon:
+  spam:
+    - "เครดิตฟรี"
+  doxxing:
+    - "เลขบัตร"
+  self-harm:
+    - "จบชีวิต"
+  parasocial-bait:
+    - "รักกันสองคน"
+
+severity:
+  safe: 0
+  spam: 1
+  parasocial-bait: 1
+  impersonation-bait: 2
+  harassment: 2
+  sexual: 2
+  hate: 3
+  illegal: 3
+  self-harm: 3
+  doxxing: 3
+
+actions:
+  safe: allow
+  spam: ignore
+  parasocial-bait: soft-refuse
+  impersonation-bait: soft-refuse
+  harassment: hard-refuse
+  sexual: hard-refuse
+  hate: escalate
+  illegal: escalate
+  self-harm: escalate
+  doxxing: escalate
