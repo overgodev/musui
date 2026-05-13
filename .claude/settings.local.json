@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Recurse E:\\\\musui)",
+      "Bash(dir E:\\\\\\\\musui)",
+      "Bash(xargs ls -la)",
+      "Bash(python scripts/search.py \"AI VTuber chat desktop app dark mode purple pink accent\" --design-system -p \"musui VApp\" -f markdown)",
+      "Bash(Get-ChildItem *)",
+      "PowerShell(cmd /c \"dir E:\\\\musui /a /b 2>&1\")",
+      "PowerShell(cmd /c \"E:\\\\musui\\\\.venv\\\\Scripts\\\\python.exe --version 2>&1\")",
+      "PowerShell(cmd /c \"E:\\\\musui\\\\.venv310\\\\Scripts\\\\python.exe --version 2>&1\")",
+      "PowerShell(cmd /c \"E:\\\\musui\\\\.venv\\\\Scripts\\\\pip.exe show edge-tts 2>&1 | findstr /i version\")",
+      "PowerShell(cmd /c \"dir E:\\\\musui\\\\VApp\\\\node_modules /b /a:d 2>&1 | findstr /v \"\"^$\"\" | head\" 2>&1)",
+      "PowerShell(cmd /c \"E:\\\\musui\\\\.venv310\\\\Scripts\\\\pip.exe show edge-tts httpx 2>&1 | findstr /i version\")",
+      "PowerShell(cmd /c \"dir E:\\\\musui\\\\VApp\\\\node_modules /b /a:d 2>&1\" | Select-Object -First 10)",
+      "PowerShell(cmd /c \"dir E:\\\\musui\\\\VApp\\\\node_modules\\\\form-data /a:d /b 2>&1\")",
+      "PowerShell(cmd /c \"E:\\\\musui\\\\.venv\\\\Scripts\\\\pip.exe install -e E:\\\\musui[test] 2>&1\")",
+      "PowerShell(cmd /c \"where python 2>&1\")",
+      "PowerShell(cmd /c \"python -c \"\"import edge_tts; print\\(edge_tts.__version__\\)\"\" 2>&1\")",
+      "PowerShell(cmd /c \"pip install edge-tts 2>&1\")",
+      "PowerShell(cmd /c \"python -c \"\"import edge_tts; print\\('edge-tts OK:', edge_tts.__version__\\)\"\" 2>&1\")",
+      "PowerShell(cmd /c \"E:\\\\musui\\\\.venv\\\\Scripts\\\\pip.exe install edge-tts>=6.1 2>&1\" | Select-Object -Last 5)",
+      "PowerShell(cmd /c \"E:\\\\musui\\\\.venv\\\\Scripts\\\\pip.exe install \"\"edge-tts>=6.1\"\" 2>&1\")",
+      "PowerShell(cmd /c \"E:\\\\musui\\\\.venv310\\\\Scripts\\\\pip.exe install edge-tts httpx 2>&1\" | Select-Object -Last 8)",
+      "PowerShell(cmd /c \"cd E:\\\\musui\\\\VApp && npm install 2>&1\")",
+      "PowerShell(cmd /c \"python E:\\\\musui\\\\VApp\\\\src\\\\rvc_tts_helper.py \"\"สวัสดี\"\" E:\\\\musui\\\\artifacts\\\\audio\\\\test_edge.wav 2>&1\")",
+      "PowerShell(cmd /c \"dir E:\\\\musui\\\\artifacts\\\\audio\\\\test_edge.wav 2>&1\")",
+      "PowerShell(cmd /c \"tasklist /fi \"\"imagename eq electron.exe\"\" /fo csv /nh 2>&1\" | Select-Object -First 5)",
+      "PowerShell(cmd /c \"ping -n 3 192.168.1.17 2>&1\")",
+      "PowerShell(cmd /c \"powershell -command \"\"Test-NetConnection -ComputerName 192.168.1.17 -Port 7865 2>&1\"\"\")",
+      "PowerShell(cmd /c \"curl -s http://192.168.1.17:7865/info 2>&1\" | Select-Object -First 30)",
+      "PowerShell(cmd /c \"dir \"\"%APPDATA%\\\\vtube-ai\"\" /b 2>&1\")"
+    ]
+  }
+}

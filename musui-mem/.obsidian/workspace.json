@@ -1,0 +1,194 @@
+{
+  "main": {
+    "id": "748d4db841ee5b59",
+    "type": "split",
+    "children": [
+      {
+        "id": "69e7c78a0225de9b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "8d2bf5efacb4b081",
+            "type": "leaf",
+            "state": {
+              "type": "canvas",
+              "state": {
+                "file": "musui_architecture.canvas",
+                "viewState": {
+                  "x": 100.87204874333588,
+                  "y": -169.23838537699922,
+                  "zoom": -0.7802605172498563
+                }
+              },
+              "icon": "lucide-layout-dashboard",
+              "title": "musui_architecture"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "43957cbac12b9e4c",
+    "type": "split",
+    "children": [
+      {
+        "id": "920b02da844de80d",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "edc8303543d472a4",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "5170665f1820f22e",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "866132b92a81ee1e",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "1538d7319f3d381a",
+    "type": "split",
+    "children": [
+      {
+        "id": "75c15b33020473dc",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "adcd261f3f902b2d",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "musui_architecture.canvas",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for musui_architecture"
+            }
+          },
+          {
+            "id": "6bee69d5670e0b16",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "musui_architecture.canvas",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from musui_architecture"
+            }
+          },
+          {
+            "id": "65cab58ba4d453c5",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "a48ccf1c0864fc9a",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "All properties"
+            }
+          },
+          {
+            "id": "459447aa8e65ae3f",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "musui_architecture.canvas",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of musui_architecture"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "bases:Create new base": false
+    }
+  },
+  "active": "8d2bf5efacb4b081",
+  "lastOpenFiles": [
+    "musui_map.md",
+    "musui_architecture.canvas"
+  ]
+}

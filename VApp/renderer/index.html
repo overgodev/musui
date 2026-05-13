@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="th">
 <head>
 <meta charset="UTF-8" />
@@ -8,759 +8,383 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-/* ── RESET & ROOT ─────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-:root {
-  --bg0:    #080811;
-  --bg1:    #0d0d1a;
-  --bg2:    #111128;
-  --bg3:    #16162e;
-  --panel:  #13132280;
-  --border: #2a2a4a;
-  --border2:#3a3a6a;
-  --accent: #7c6aff;
-  --accent2:#b06aff;
-  --pink:   #ff6ab0;
-  --cyan:   #6adfff;
-  --green:  #6affa0;
-  --yellow: #ffda6a;
-  --red:    #ff6a6a;
-  --text:   #e8e8ff;
-  --text2:  #9090c0;
-  --text3:  #5050a0;
-  --glow:   0 0 20px #7c6aff44;
-  --glow2:  0 0 30px #7c6aff66;
-  --r:      10px;
-  --r2:     6px;
-  --mono:   'Share Tech Mono', monospace;
-  --ui:     'Rajdhani', 'Noto Sans Thai', sans-serif;
-  --body:   'Noto Sans Thai', 'Rajdhani', sans-serif;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg0:#080811;--bg1:#0d0d1a;--bg2:#111128;--bg3:#16162e;
+  --border:#2a2a4a;--border2:#3a3a6a;
+  --accent:#7c6aff;--accent2:#b06aff;--pink:#ff6ab0;
+  --cyan:#6adfff;--green:#6affa0;--yellow:#ffda6a;--red:#ff6a6a;
+  --text:#e8e8ff;--text2:#9090c0;--text3:#5050a0;
+  --glow:0 0 20px #7c6aff44;--glow2:0 0 30px #7c6aff66;
+  --r:10px;--r2:6px;
+  --mono:'Share Tech Mono',monospace;
+  --ui:'Rajdhani','Noto Sans Thai',sans-serif;
+  --body:'Noto Sans Thai','Rajdhani',sans-serif;
 }
-
-html, body { height: 100%; background: var(--bg0); color: var(--text); font-family: var(--body); overflow: hidden; }
-
-/* ── SCROLLBAR ────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--bg1); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-/* ── APP SHELL ────────────────────────────────────────────────── */
-#app { display: flex; flex-direction: column; height: 100vh; background: var(--bg0); }
-
-/* ── TITLEBAR ─────────────────────────────────────────────────── */
-#titlebar {
-  display: flex; align-items: center; justify-content: space-between;
-  height: 40px; padding: 0 16px;
-  background: var(--bg1);
-  border-bottom: 1px solid var(--border);
-  -webkit-app-region: drag;
-  flex-shrink: 0;
-  user-select: none;
-}
-.titlebar-left { display: flex; align-items: center; gap: 10px; }
-.app-logo { font-family: var(--ui); font-weight: 700; font-size: 15px; letter-spacing: 2px;
-  background: linear-gradient(135deg, var(--accent), var(--pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.app-ver { font-size: 10px; color: var(--text3); font-family: var(--mono); }
-.titlebar-controls { display: flex; gap: 6px; -webkit-app-region: no-drag; }
-.wbtn { width: 28px; height: 28px; border-radius: 50%; border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; font-size: 11px; transition: all .2s; }
-.wbtn-min { background: #3a3a50; color: var(--text2); }
-.wbtn-max { background: #3a3a50; color: var(--text2); }
-.wbtn-cls { background: #ff4444; color: #fff; }
-.wbtn:hover { transform: scale(1.1); filter: brightness(1.3); }
-
-/* ── MAIN LAYOUT ──────────────────────────────────────────────── */
-#layout { display: flex; flex: 1; overflow: hidden; }
-
-/* ── SIDEBAR ──────────────────────────────────────────────────── */
-#sidebar {
-  width: 56px; background: var(--bg1);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction: column; align-items: center;
-  padding: 12px 0; gap: 6px; flex-shrink: 0; transition: width .25s ease;
-}
-#sidebar.expanded { width: 200px; }
-
-.nav-btn {
-  width: 40px; height: 40px; border-radius: var(--r2); border: 1px solid transparent;
-  background: transparent; color: var(--text3); cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; transition: all .2s; position: relative; flex-shrink: 0;
-}
-.nav-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--border2); }
-.nav-btn.active { background: #7c6aff22; color: var(--accent); border-color: var(--accent); box-shadow: var(--glow); }
-.nav-btn .nav-label { display: none; font-family: var(--ui); font-size: 13px; font-weight: 600; white-space: nowrap; }
-
-/* ── CONTENT AREA ─────────────────────────────────────────────── */
-#content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
-
-/* ── PANELS ───────────────────────────────────────────────────── */
-.panel { display: none; flex: 1; overflow: hidden; flex-direction: column; }
-.panel.active { display: flex; }
-
-/* ── PANEL: CHAT ──────────────────────────────────────────────── */
-#panel-chat { display: none; }
-#panel-chat.active { display: flex; flex-direction: row; overflow: hidden; }
-
-.chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.chat-sidebar-r {
-  width: 280px; flex-shrink: 0;
-  border-left: 1px solid var(--border);
-  background: var(--bg1);
-  display: flex; flex-direction: column; overflow: hidden;
-}
-
-/* Messages */
-#chat-messages {
-  flex: 1; overflow-y: auto; padding: 20px 16px;
-  display: flex; flex-direction: column; gap: 12px;
-}
-
-.msg { display: flex; gap: 10px; animation: msgIn .3s ease; }
-@keyframes msgIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform:none; } }
-.msg.user { flex-direction: row-reverse; }
-
-.msg-avatar {
-  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center; font-size: 16px;
-  border: 2px solid var(--border2);
-}
-.msg.ai .msg-avatar { background: linear-gradient(135deg, #7c6aff33, #b06aff33); border-color: var(--accent); }
-.msg.user .msg-avatar { background: linear-gradient(135deg, #ff6ab033, #6adfff33); border-color: var(--pink); }
-
-.msg-bubble {
-  max-width: 70%; padding: 10px 14px; border-radius: 12px;
-  font-size: 14px; line-height: 1.6; word-break: break-word;
-}
-.msg.ai .msg-bubble {
-  background: var(--bg3); border: 1px solid var(--border2);
-  border-top-left-radius: 4px; color: var(--text);
-}
-.msg.user .msg-bubble {
-  background: linear-gradient(135deg, #7c6aff22, #b06aff22);
-  border: 1px solid var(--accent);
-  border-top-right-radius: 4px; color: var(--text);
-}
-.msg-time { font-size: 10px; color: var(--text3); margin-top: 4px; font-family: var(--mono); }
-
-/* Chat Input */
-#chat-input-area {
-  padding: 12px 16px; border-top: 1px solid var(--border);
-  background: var(--bg1); display: flex; flex-direction: column; gap: 8px;
-}
-.input-row { display: flex; gap: 8px; align-items: flex-end; }
-
-#chat-input {
-  flex: 1; background: var(--bg2); border: 1px solid var(--border2);
-  border-radius: var(--r); padding: 10px 14px; color: var(--text);
-  font-family: var(--body); font-size: 14px; resize: none; min-height: 44px; max-height: 140px;
-  outline: none; transition: border-color .2s;
-}
-#chat-input:focus { border-color: var(--accent); box-shadow: var(--glow); }
-#chat-input::placeholder { color: var(--text3); }
-
-.btn-icon {
-  width: 44px; height: 44px; border-radius: var(--r); border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; font-size: 18px;
-  transition: all .2s; flex-shrink: 0;
-}
-.btn-send { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
-.btn-send:hover { transform: scale(1.05); box-shadow: var(--glow2); }
-.btn-send:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-.btn-stop { background: var(--red); color: #fff; }
-.btn-stop:hover { transform: scale(1.05); }
-.btn-tts { background: var(--bg3); border: 1px solid var(--border2); color: var(--text2); }
-.btn-tts.active { background: #6affa022; border-color: var(--green); color: var(--green); }
-
-/* Chat right sidebar */
-.cr-section { padding: 12px; border-bottom: 1px solid var(--border); }
-.cr-title { font-family: var(--ui); font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
-  color: var(--text3); text-transform: uppercase; margin-bottom: 10px; }
-
-/* Persona area */
-#persona-avatar-display {
-  width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 10px;
-  background: linear-gradient(135deg, #7c6aff22, #ff6ab022);
-  border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center;
-  font-size: 36px;
-}
-#persona-name-display { text-align: center; font-family: var(--ui); font-weight: 700; font-size: 16px;
-  color: var(--accent); margin-bottom: 4px; }
-#persona-desc-display { text-align: center; font-size: 12px; color: var(--text2); line-height: 1.5; }
-
-/* Emotion display */
-.emotion-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 4px; }
-.emo-btn {
-  padding: 6px 4px; border-radius: var(--r2); border: 1px solid var(--border);
-  background: var(--bg2); cursor: pointer; font-size: 18px; text-align: center;
-  transition: all .2s;
-}
-.emo-btn:hover { border-color: var(--accent); transform: scale(1.05); }
-.emo-btn.active { border-color: var(--pink); background: #ff6ab022; }
-.emo-label { font-size: 9px; color: var(--text3); font-family: var(--ui); display: block; margin-top: 2px; }
-
-/* Hotkey list */
-.hotkey-list { display: flex; flex-direction: column; gap: 4px; max-height: 180px; overflow-y: auto; }
-.hotkey-item {
-  padding: 6px 10px; background: var(--bg2); border: 1px solid var(--border);
-  border-radius: var(--r2); cursor: pointer; font-size: 12px; font-family: var(--ui);
-  transition: all .2s; display: flex; justify-content: space-between; align-items: center;
-}
-.hotkey-item:hover { border-color: var(--accent); color: var(--accent); }
-
-/* Speaking indicator */
-#speaking-indicator {
-  display: none; align-items: center; gap: 6px;
-  padding: 6px 12px; background: #6affa015; border: 1px solid var(--green);
-  border-radius: 20px; font-size: 12px; color: var(--green); font-family: var(--ui);
-}
-#speaking-indicator.visible { display: flex; }
-.wave { display: flex; gap: 2px; align-items: center; }
-.wave span { width: 3px; background: var(--green); border-radius: 3px; animation: wave 1s ease-in-out infinite; }
-.wave span:nth-child(1) { height: 8px; animation-delay: 0s; }
-.wave span:nth-child(2) { height: 14px; animation-delay: .15s; }
-.wave span:nth-child(3) { height: 10px; animation-delay: .3s; }
-.wave span:nth-child(4) { height: 16px; animation-delay: .1s; }
-.wave span:nth-child(5) { height: 8px; animation-delay: .25s; }
-@keyframes wave { 0%,100% { transform: scaleY(.5); } 50% { transform: scaleY(1); } }
-
-/* ── SETTINGS PANEL ──────────────────────────────────────────── */
-#panel-settings {
-  overflow-y: auto; padding: 24px;
-  background: var(--bg0);
-}
-.settings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; max-width: 1100px; }
-
-.settings-card {
-  background: var(--bg1); border: 1px solid var(--border);
-  border-radius: var(--r); padding: 20px;
-  transition: border-color .2s;
-}
-.settings-card:hover { border-color: var(--border2); }
-.card-title {
-  display: flex; align-items: center; gap: 8px;
-  font-family: var(--ui); font-weight: 700; font-size: 14px; letter-spacing: .5px;
-  color: var(--text); margin-bottom: 16px;
-  padding-bottom: 10px; border-bottom: 1px solid var(--border);
-}
-.card-icon { font-size: 18px; }
-.card-badge {
-  margin-left: auto; font-size: 10px; padding: 2px 8px; border-radius: 10px;
-  font-family: var(--mono); font-weight: 400;
-}
-.badge-connected { background: #6affa022; color: var(--green); border: 1px solid var(--green); }
-.badge-disconnected { background: #ff6a6a22; color: var(--red); border: 1px solid var(--red); }
-
-/* Form elements */
-.form-group { margin-bottom: 14px; }
-.form-label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px;
-  font-family: var(--ui); font-weight: 600; letter-spacing: .5px; }
-.form-input, .form-select, .form-textarea {
-  width: 100%; padding: 9px 12px;
-  background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--r2);
-  color: var(--text); font-family: var(--body); font-size: 13px;
-  outline: none; transition: border-color .2s, box-shadow .2s;
-}
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-  border-color: var(--accent); box-shadow: var(--glow);
-}
-.form-select option { background: var(--bg2); }
-.form-textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
-.form-row { display: flex; gap: 8px; }
-.form-row .form-group { flex: 1; }
-
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  padding: 9px 16px; border-radius: var(--r2); border: none; cursor: pointer;
-  font-family: var(--ui); font-weight: 600; font-size: 13px; letter-spacing: .5px;
-  transition: all .2s; white-space: nowrap;
-}
-.btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #fff; }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: var(--glow2); }
-.btn-secondary { background: var(--bg3); border: 1px solid var(--border2); color: var(--text); }
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-.btn-danger { background: #ff6a6a22; border: 1px solid var(--red); color: var(--red); }
-.btn-danger:hover { background: #ff6a6a44; }
-.btn-sm { padding: 6px 12px; font-size: 12px; }
-.btn-full { width: 100%; }
-.btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-
-/* Status dots */
-.status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.status-dot.on { background: var(--green); box-shadow: 0 0 6px var(--green); }
-.status-dot.off { background: var(--red); }
-.status-dot.loading { background: var(--yellow); animation: pulse .8s ease infinite; }
-@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
-
-/* Model file picker */
-.file-picker { display: flex; gap: 8px; align-items: center; }
-.file-picker .form-input { flex: 1; }
-.file-display { font-size: 11px; color: var(--text3); margin-top: 4px; font-family: var(--mono);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* Slider */
-.form-slider { width: 100%; accent-color: var(--accent); cursor: pointer; }
-.slider-row { display: flex; align-items: center; gap: 10px; }
-.slider-val { font-family: var(--mono); font-size: 13px; color: var(--accent); min-width: 36px; text-align: right; }
-
-/* ── PERSONA PANEL ────────────────────────────────────────────── */
-#panel-persona { overflow-y: auto; padding: 24px; background: var(--bg0); }
-.persona-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-bottom: 20px; }
-.persona-card {
-  background: var(--bg1); border: 2px solid var(--border); border-radius: var(--r);
-  padding: 16px; cursor: pointer; transition: all .2s; text-align: center;
-}
-.persona-card:hover { border-color: var(--border2); transform: translateY(-2px); }
-.persona-card.active { border-color: var(--accent); box-shadow: var(--glow); }
-.persona-emoji { font-size: 40px; margin-bottom: 8px; }
-.persona-card-name { font-family: var(--ui); font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 4px; }
-.persona-card-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
-.persona-add {
-  background: var(--bg1); border: 2px dashed var(--border2); border-radius: var(--r);
-  padding: 16px; cursor: pointer; transition: all .2s; text-align: center;
-  color: var(--text3); font-family: var(--ui); font-size: 13px;
-}
-.persona-add:hover { border-color: var(--accent); color: var(--accent); }
-
-.persona-editor {
-  background: var(--bg1); border: 1px solid var(--border); border-radius: var(--r);
-  padding: 20px; max-width: 600px;
-}
-.persona-editor-title { font-family: var(--ui); font-weight: 700; font-size: 16px;
-  color: var(--text); margin-bottom: 16px; }
-
-/* ── LOG / STATUS BAR ─────────────────────────────────────────── */
-#statusbar {
-  height: 28px; background: var(--bg1); border-top: 1px solid var(--border);
-  display: flex; align-items: center; padding: 0 16px; gap: 16px;
-  flex-shrink: 0;
-}
-.status-item { display: flex; align-items: center; gap: 6px; font-size: 11px;
-  color: var(--text3); font-family: var(--mono); }
-.status-item .label { color: var(--text3); }
-.status-item .val { color: var(--text2); }
-.status-item .val.ok { color: var(--green); }
-.status-item .val.err { color: var(--red); }
-#status-log { margin-left: auto; font-size: 11px; color: var(--text3); font-family: var(--mono);
-  max-width: 500px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* ── MISC ─────────────────────────────────────────────────────── */
-.section-head { font-family: var(--ui); font-weight: 700; font-size: 18px;
-  color: var(--text); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-.section-head::after { content:''; flex: 1; height: 1px; background: var(--border); }
-
-.tag { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
-  border-radius: 10px; font-size: 11px; font-family: var(--mono); }
-.tag-purple { background: #7c6aff22; color: var(--accent); border: 1px solid var(--accent); }
-.tag-pink { background: #ff6ab022; color: var(--pink); border: 1px solid var(--pink); }
-
-.hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
-
-/* Loading spinner */
-.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border2);
-  border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ── TOAST ─────────────────────────────────────────────────────── */
-#toast-container { position: fixed; bottom: 40px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
-.toast {
-  padding: 10px 16px; border-radius: var(--r); font-size: 13px; font-family: var(--ui);
-  font-weight: 600; animation: toastIn .3s ease;
-  display: flex; align-items: center; gap: 8px;
-  backdrop-filter: blur(10px);
-}
-@keyframes toastIn { from { opacity:0; transform: translateX(20px); } to { opacity:1; transform:none; } }
-.toast-success { background: #6affa020; border: 1px solid var(--green); color: var(--green); }
-.toast-error { background: #ff6a6a20; border: 1px solid var(--red); color: var(--red); }
-.toast-info { background: #7c6aff20; border: 1px solid var(--accent); color: var(--accent); }
+html,body{height:100%;background:var(--bg0);color:var(--text);font-family:var(--body);overflow:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg1)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+[data-lucide]{display:inline-block;vertical-align:middle;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;fill:none;pointer-events:none}
+.icon{width:16px;height:16px}.icon-sm{width:13px;height:13px}.icon-lg{width:20px;height:20px}.icon-xl{width:28px;height:28px}
+#app{display:flex;flex-direction:column;height:100vh;background:var(--bg0)}
+#titlebar{display:flex;align-items:center;justify-content:space-between;height:40px;padding:0 16px;background:var(--bg1);border-bottom:1px solid var(--border);-webkit-app-region:drag;flex-shrink:0;user-select:none}
+.titlebar-left{display:flex;align-items:center;gap:10px}
+.app-emblem{display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.app-logo{font-family:var(--ui);font-weight:700;font-size:15px;letter-spacing:2px;background:linear-gradient(135deg,var(--accent),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.app-ver{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.titlebar-controls{display:flex;gap:6px;-webkit-app-region:no-drag}
+.wbtn{width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.wbtn-min,.wbtn-max{background:#3a3a50;color:var(--text2)}.wbtn-cls{background:#ff4444;color:#fff}
+.wbtn:hover{transform:scale(1.1);filter:brightness(1.3)}
+#layout{display:flex;flex:1;overflow:hidden}
+#sidebar{width:56px;background:var(--bg1);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:6px;flex-shrink:0}
+.nav-btn{width:40px;height:40px;border-radius:var(--r2);border:1px solid transparent;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.nav-btn:hover{background:var(--bg3);color:var(--text);border-color:var(--border2)}
+.nav-btn.active{background:#7c6aff22;color:var(--accent);border-color:var(--accent);box-shadow:var(--glow)}
+#content{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.panel{display:none;flex:1;overflow:hidden;flex-direction:column}.panel.active{display:flex}
+#panel-chat{display:none}#panel-chat.active{display:flex;flex-direction:row;overflow:hidden}
+.chat-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.chat-sidebar-r{width:280px;flex-shrink:0;border-left:1px solid var(--border);background:var(--bg1);display:flex;flex-direction:column;overflow:hidden}
+#chat-messages{flex:1;overflow-y:auto;padding:20px 16px;display:flex;flex-direction:column;gap:12px}
+.msg{display:flex;gap:10px;animation:msgIn .3s ease}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.msg.user{flex-direction:row-reverse}
+.msg-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--border2);font-size:15px}
+.msg.ai .msg-avatar{background:linear-gradient(135deg,#7c6aff22,#b06aff22);border-color:var(--accent);color:var(--accent)}
+.msg.user .msg-avatar{background:linear-gradient(135deg,#ff6ab022,#6adfff22);border-color:var(--pink);color:var(--pink)}
+.msg-bubble{max-width:70%;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.6;word-break:break-word}
+.msg.ai .msg-bubble{background:var(--bg3);border:1px solid var(--border2);border-top-left-radius:4px;color:var(--text)}
+.msg.user .msg-bubble{background:linear-gradient(135deg,#7c6aff22,#b06aff22);border:1px solid var(--accent);border-top-right-radius:4px;color:var(--text)}
+.msg-time{font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono)}
+#chat-input-area{padding:12px 16px;border-top:1px solid var(--border);background:var(--bg1);display:flex;flex-direction:column;gap:8px}
+.input-row{display:flex;gap:8px;align-items:flex-end}
+#chat-input{flex:1;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 14px;color:var(--text);font-family:var(--body);font-size:14px;resize:none;min-height:44px;max-height:140px;outline:none;transition:border-color .2s}
+#chat-input:focus{border-color:var(--accent);box-shadow:var(--glow)}
+#chat-input::placeholder{color:var(--text3)}
+.btn-icon{width:44px;height:44px;border-radius:var(--r);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.btn-send{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-send:hover{transform:scale(1.05);box-shadow:var(--glow2)}.btn-send:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-tts{background:var(--bg3);border:1px solid var(--border2);color:var(--text2)}
+.btn-tts.active{background:#6affa022;border-color:var(--green);color:var(--green)}
+.cr-section{padding:12px;border-bottom:1px solid var(--border)}
+.cr-title{font-family:var(--ui);font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:10px}
+#persona-avatar-display{width:80px;height:80px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,#7c6aff22,#ff6ab022);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--accent)}
+#persona-name-display{text-align:center;font-family:var(--ui);font-weight:700;font-size:16px;color:var(--accent);margin-bottom:4px}
+#persona-desc-display{text-align:center;font-size:12px;color:var(--text2);line-height:1.5}
+.emotion-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.emo-btn{padding:8px 4px;border-radius:var(--r2);border:1px solid var(--border);background:var(--bg2);cursor:pointer;text-align:center;color:var(--text2);display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .2s}
+.emo-btn:hover{border-color:var(--accent);color:var(--accent);transform:scale(1.05)}
+.emo-btn.active{border-color:var(--pink);background:#ff6ab022;color:var(--pink)}
+.emo-label{font-size:9px;color:inherit;font-family:var(--ui)}
+.hotkey-list{display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto}
+.hotkey-item{padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);cursor:pointer;font-size:12px;font-family:var(--ui);transition:all .2s;display:flex;justify-content:space-between;align-items:center}
+.hotkey-item:hover{border-color:var(--accent);color:var(--accent)}
+#speaking-indicator{display:none;align-items:center;gap:6px;padding:6px 12px;background:#6affa015;border:1px solid var(--green);border-radius:20px;font-size:12px;color:var(--green);font-family:var(--ui)}
+#speaking-indicator.visible{display:flex}
+.wave{display:flex;gap:2px;align-items:center}
+.wave span{width:3px;background:var(--green);border-radius:3px;animation:wave 1s ease-in-out infinite}
+.wave span:nth-child(1){height:8px;animation-delay:0s}.wave span:nth-child(2){height:14px;animation-delay:.15s}
+.wave span:nth-child(3){height:10px;animation-delay:.3s}.wave span:nth-child(4){height:16px;animation-delay:.1s}
+.wave span:nth-child(5){height:8px;animation-delay:.25s}
+@keyframes wave{0%,100%{transform:scaleY(.5)}50%{transform:scaleY(1)}}
+#panel-settings{overflow-y:auto;padding:24px;background:var(--bg0)}
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;max-width:1100px}
+.settings-card{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:20px;transition:border-color .2s}
+.settings-card:hover{border-color:var(--border2)}
+.card-title{display:flex;align-items:center;gap:8px;font-family:var(--ui);font-weight:700;font-size:14px;letter-spacing:.5px;color:var(--text);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.card-icon{display:flex;align-items:center;color:var(--accent)}
+.card-badge{margin-left:auto;font-size:10px;padding:2px 8px;border-radius:10px;font-family:var(--mono);font-weight:400}
+.badge-connected{background:#6affa022;color:var(--green);border:1px solid var(--green)}
+.badge-disconnected{background:#ff6a6a22;color:var(--red);border:1px solid var(--red)}
+.form-group{margin-bottom:14px}
+.form-label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px;font-family:var(--ui);font-weight:600;letter-spacing:.5px}
+.form-input,.form-select,.form-textarea{width:100%;padding:9px 12px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r2);color:var(--text);font-family:var(--body);font-size:13px;outline:none;transition:border-color .2s,box-shadow .2s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:var(--glow)}
+.form-select option{background:var(--bg2)}.form-textarea{resize:vertical;min-height:80px;line-height:1.6}
+.form-row{display:flex;gap:8px}.form-row .form-group{flex:1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 16px;border-radius:var(--r2);border:none;cursor:pointer;font-family:var(--ui);font-weight:600;font-size:13px;letter-spacing:.5px;transition:all .2s;white-space:nowrap}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:var(--glow2)}
+.btn-secondary{background:var(--bg3);border:1px solid var(--border2);color:var(--text)}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:#ff6a6a22;border:1px solid var(--red);color:var(--red)}.btn-danger:hover{background:#ff6a6a44}
+.btn-sm{padding:6px 12px;font-size:12px}.btn-full{width:100%}.btn-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-dot.on{background:var(--green);box-shadow:0 0 6px var(--green)}.status-dot.off{background:var(--red)}
+.status-dot.loading{background:var(--yellow);animation:pulse .8s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.file-picker{display:flex;gap:8px;align-items:center}.file-picker .form-input{flex:1}
+.file-display{font-size:11px;color:var(--text3);margin-top:4px;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.form-slider{width:100%;accent-color:var(--accent);cursor:pointer}
+.slider-row{display:flex;align-items:center;gap:10px}
+.slider-val{font-family:var(--mono);font-size:13px;color:var(--accent);min-width:36px;text-align:right}
+#panel-persona{overflow-y:auto;padding:24px;background:var(--bg0)}
+.persona-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px}
+.persona-card{background:var(--bg1);border:2px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;text-align:center}
+.persona-card:hover{border-color:var(--border2);transform:translateY(-2px)}.persona-card.active{border-color:var(--accent);box-shadow:var(--glow)}
+.persona-emoji{font-size:36px;margin-bottom:8px;line-height:1.3}
+.persona-card-name{font-family:var(--ui);font-weight:700;font-size:15px;color:var(--text);margin-bottom:4px}
+.persona-card-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.persona-add{background:var(--bg1);border:2px dashed var(--border2);border-radius:var(--r);padding:16px;cursor:pointer;transition:all .2s;text-align:center;color:var(--text3);font-family:var(--ui);font-size:13px;display:flex;align-items:center;justify-content:center;gap:6px}
+.persona-add:hover{border-color:var(--accent);color:var(--accent)}
+.persona-editor{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);padding:20px;max-width:600px}
+.persona-editor-title{font-family:var(--ui);font-weight:700;font-size:16px;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+#statusbar{height:28px;background:var(--bg1);border-top:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:16px;flex-shrink:0}
+.status-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);font-family:var(--mono)}
+.status-item .label{color:var(--text3)}.status-item .val{color:var(--text2)}.status-item .val.ok{color:var(--green)}.status-item .val.err{color:var(--red)}
+#status-log{margin-left:auto;font-size:11px;color:var(--text3);font-family:var(--mono);max-width:500px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.section-head{font-family:var(--ui);font-weight:700;font-size:18px;color:var(--text);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.section-head::after{content:'';flex:1;height:1px;background:var(--border)}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:10px;font-size:11px;font-family:var(--mono)}
+.tag-purple{background:#7c6aff22;color:var(--accent);border:1px solid var(--accent)}
+.tag-pink{background:#ff6ab022;color:var(--pink);border:1px solid var(--pink)}
+.hint{font-size:11px;color:var(--text3);margin-top:4px}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#toast-container{position:fixed;bottom:40px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:9999}
+.toast{padding:10px 16px;border-radius:var(--r);font-size:13px;font-family:var(--ui);font-weight:600;animation:toastIn .3s ease;display:flex;align-items:center;gap:8px;backdrop-filter:blur(10px)}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+.toast-success{background:#6affa020;border:1px solid var(--green);color:var(--green)}
+.toast-error{background:#ff6a6a20;border:1px solid var(--red);color:var(--red)}
+.toast-info{background:#7c6aff20;border:1px solid var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
 <div id="app">
-
   <!-- TITLEBAR -->
   <div id="titlebar">
     <div class="titlebar-left">
-      <span class="app-logo">✦ VTUBE AI</span>
+      <div class="app-emblem">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="emb" x1="2" y1="2" x2="18" y2="18" gradientUnits="userSpaceOnUse"><stop stop-color="#7c6aff"/><stop offset="1" stop-color="#ff6ab0"/></linearGradient></defs>
+          <path d="M10 2L17.5 6V14L10 18L2.5 14V6L10 2Z" stroke="url(#emb)" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M10 6L14 8.5V12.5L10 15L6 12.5V8.5L10 6Z" fill="url(#emb)" opacity="0.3"/>
+          <circle cx="10" cy="10" r="2.2" fill="url(#emb)"/>
+        </svg>
+      </div>
+      <span class="app-logo">VTUBE AI</span>
       <span class="app-ver">v1.0.0</span>
       <div id="speaking-indicator">
         <div class="wave"><span></span><span></span><span></span><span></span><span></span></div>
-        กำลังพูด...
+        <span>&#3585;&#3635;&#3621;&#3633;&#3591;&#3614;&#3641;&#3604;...</span>
       </div>
     </div>
     <div class="titlebar-controls">
-      <button class="wbtn wbtn-min" onclick="api.minimize()">─</button>
-      <button class="wbtn wbtn-max" onclick="api.maximize()">□</button>
-      <button class="wbtn wbtn-cls" onclick="api.close()">✕</button>
+      <button class="wbtn wbtn-min" onclick="api.minimize()"><i data-lucide="minus" class="icon-sm"></i></button>
+      <button class="wbtn wbtn-max" onclick="api.maximize()"><i data-lucide="maximize-2" class="icon-sm"></i></button>
+      <button class="wbtn wbtn-cls" onclick="api.close()"><i data-lucide="x" class="icon-sm"></i></button>
     </div>
   </div>
 
-  <!-- MAIN LAYOUT -->
   <div id="layout">
-
-    <!-- SIDEBAR -->
     <nav id="sidebar">
-      <button class="nav-btn active" data-panel="chat" title="Chat" onclick="switchPanel('chat', this)">💬</button>
-      <button class="nav-btn" data-panel="persona" title="ตัวละคร" onclick="switchPanel('persona', this)">🎭</button>
-      <button class="nav-btn" data-panel="settings" title="ตั้งค่า" onclick="switchPanel('settings', this)">⚙️</button>
+      <button class="nav-btn active" data-panel="chat" title="Chat" onclick="switchPanel('chat',this)"><i data-lucide="message-square" class="icon-lg"></i></button>
+      <button class="nav-btn" data-panel="persona" title="&#3605;&#3633;&#3623;&#3621;&#3632;&#3588;&#3619;" onclick="switchPanel('persona',this)"><i data-lucide="user-round" class="icon-lg"></i></button>
+      <button class="nav-btn" data-panel="settings" title="&#3605;&#3633;&#3657;&#3591;&#3588;&#3656;&#3634;" onclick="switchPanel('settings',this)"><i data-lucide="settings" class="icon-lg"></i></button>
     </nav>
 
-    <!-- CONTENT -->
     <div id="content">
 
-      <!-- PANEL: CHAT -->
+      <!-- CHAT PANEL -->
       <div id="panel-chat" class="panel active">
         <div class="chat-main">
           <div id="chat-messages">
             <div class="msg ai">
-              <div class="msg-avatar">🤖</div>
+              <div class="msg-avatar"><i data-lucide="bot" class="icon"></i></div>
               <div>
-                <div class="msg-bubble">สวัสดีครับ! ฉันคือ VTube AI พร้อมช่วยเหลือแล้ว กรุณาตั้งค่า LM Studio API ก่อนเริ่มใช้งานนะครับ ✨</div>
+                <div class="msg-bubble">&#3626;&#3623;&#3633;&#3626;&#3604;&#3637;&#3588;&#3619;&#3633;&#3610;! &#3609;&#3637;&#3656;&#3588;&#3639;&#3629; VTube AI &#3614;&#3619;&#3657;&#3629;&#3617;&#3594;&#3656;&#3623;&#3618;&#3648;&#3627;&#3621;&#3639;&#3629;&#3649;&#3621;&#3657;&#3623; &#3585;&#3619;&#3640;&#3603;&#3634;&#3605;&#3633;&#3657;&#3591;&#3588;&#3656;&#3634; LM Studio API &#3585;&#3656;&#3629;&#3609;&#3648;&#3619;&#3636;&#3656;&#3617;&#3651;&#3594;&#3657;&#3591;&#3634;&#3609;&#3609;&#3632;&#3588;&#3619;&#3633;&#3610;</div>
                 <div class="msg-time" id="welcome-time"></div>
               </div>
             </div>
           </div>
           <div id="chat-input-area">
             <div class="input-row">
-              <textarea id="chat-input" placeholder="พิมพ์ข้อความที่นี่... (Enter ส่ง, Shift+Enter ขึ้นบรรทัดใหม่)" rows="1"></textarea>
-              <button class="btn-icon btn-tts" id="btn-tts-toggle" title="เปิด/ปิด TTS" onclick="toggleTTS()">🔊</button>
-              <button class="btn-icon btn-send" id="btn-send" onclick="sendMessage()">▶</button>
+              <textarea id="chat-input" placeholder="&#3614;&#3636;&#3617;&#3614;&#3660;&#3586;&#3657;&#3629;&#3588;&#3623;&#3634;&#3617;... (Enter &#3626;&#3656;&#3591;, Shift+Enter &#3586;&#3638;&#3657;&#3609;&#3610;&#3619;&#3619;&#3607;&#3633;&#3604;&#3651;&#3627;&#3617;&#3656;)" rows="1"></textarea>
+              <button class="btn-icon btn-tts" id="btn-tts-toggle" title="TTS" onclick="toggleTTS()"><i data-lucide="volume-2" class="icon"></i></button>
+              <button class="btn-icon btn-send" id="btn-send" onclick="sendMessage()"><i data-lucide="send" class="icon"></i></button>
             </div>
             <div style="display:flex;gap:8px;align-items:center;">
               <span style="font-size:11px;color:var(--text3);font-family:var(--mono)">MODEL:</span>
               <select class="form-select" id="model-select" style="flex:1;padding:4px 8px;font-size:12px;" onchange="saveQuickSettings()">
-                <option value="">-- เลือก model --</option>
+                <option value="">-- &#3648;&#3621;&#3639;&#3629;&#3585; model --</option>
               </select>
-              <button class="btn btn-secondary btn-sm" onclick="refreshModels()">↻ โหลด</button>
-              <button class="btn btn-danger btn-sm" onclick="clearChat()">🗑 ล้าง</button>
+              <button class="btn btn-secondary btn-sm" onclick="refreshModels()"><i data-lucide="refresh-cw" class="icon-sm"></i> &#3650;&#3627;&#3621;&#3604;</button>
+              <button class="btn btn-danger btn-sm" onclick="clearChat()"><i data-lucide="trash-2" class="icon-sm"></i> &#3621;&#3657;&#3634;&#3591;</button>
             </div>
           </div>
         </div>
 
-        <!-- RIGHT SIDEBAR -->
         <div class="chat-sidebar-r">
           <div class="cr-section">
-            <div class="cr-title">ตัวละครปัจจุบัน</div>
-            <div id="persona-avatar-display">🎭</div>
-            <div id="persona-name-display">ยังไม่ได้เลือก</div>
-            <div id="persona-desc-display">กรุณาเลือกตัวละครใน Tab ตัวละคร</div>
+            <div class="cr-title">&#3605;&#3633;&#3623;&#3621;&#3632;&#3588;&#3619;&#3611;&#3633;&#3592;&#3592;&#3640;&#3610;&#3633;&#3609;</div>
+            <div id="persona-avatar-display"><i data-lucide="user-round" class="icon-xl"></i></div>
+            <div id="persona-name-display">&#3618;&#3633;&#3591;&#3652;&#3617;&#3656;&#3652;&#3604;&#3657;&#3648;&#3621;&#3639;&#3629;&#3585;</div>
+            <div id="persona-desc-display">&#3585;&#3619;&#3640;&#3603;&#3634;&#3648;&#3621;&#3639;&#3629;&#3585;&#3605;&#3633;&#3623;&#3621;&#3632;&#3588;&#3619;&#3651;&#3609; Tab &#3605;&#3633;&#3623;&#3621;&#3632;&#3588;&#3619;</div>
           </div>
-
           <div class="cr-section">
-            <div class="cr-title">อารมณ์ / Emotion</div>
+            <div class="cr-title">&#3629;&#3634;&#3619;&#3617;&#3603;&#3660; / Emotion</div>
             <div class="emotion-grid" id="emotion-grid">
-              <button class="emo-btn" onclick="triggerEmotion('happy')">😊<span class="emo-label">Happy</span></button>
-              <button class="emo-btn" onclick="triggerEmotion('excited')">🤩<span class="emo-label">Excited</span></button>
-              <button class="emo-btn" onclick="triggerEmotion('love')">🥰<span class="emo-label">Love</span></button>
-              <button class="emo-btn" onclick="triggerEmotion('sad')">😢<span class="emo-label">Sad</span></button>
-              <button class="emo-btn" onclick="triggerEmotion('angry')">😤<span class="emo-label">Angry</span></button>
-              <button class="emo-btn" onclick="triggerEmotion('surprise')">😮<span class="emo-label">Surprise</span></button>
-              <button class="emo-btn" onclick="triggerEmotion('shy')">😳<span class="emo-label">Shy</span></button>
-              <button class="emo-btn" onclick="triggerEmotion('cool')">😎<span class="emo-label">Cool</span></button>
-              <button class="emo-btn" onclick="triggerEmotion('idle')">😐<span class="emo-label">Idle</span></button>
+              <button class="emo-btn" onclick="triggerEmotion('happy')"><i data-lucide="smile" class="icon-lg"></i><span class="emo-label">Happy</span></button>
+              <button class="emo-btn" onclick="triggerEmotion('excited')"><i data-lucide="zap" class="icon-lg"></i><span class="emo-label">Excited</span></button>
+              <button class="emo-btn" onclick="triggerEmotion('love')"><i data-lucide="heart" class="icon-lg"></i><span class="emo-label">Love</span></button>
+              <button class="emo-btn" onclick="triggerEmotion('sad')"><i data-lucide="frown" class="icon-lg"></i><span class="emo-label">Sad</span></button>
+              <button class="emo-btn" onclick="triggerEmotion('angry')"><i data-lucide="flame" class="icon-lg"></i><span class="emo-label">Angry</span></button>
+              <button class="emo-btn" onclick="triggerEmotion('surprise')"><i data-lucide="alert-circle" class="icon-lg"></i><span class="emo-label">Surprise</span></button>
+              <button class="emo-btn" onclick="triggerEmotion('shy')"><i data-lucide="eye-off" class="icon-lg"></i><span class="emo-label">Shy</span></button>
+              <button class="emo-btn" onclick="triggerEmotion('cool')"><i data-lucide="star" class="icon-lg"></i><span class="emo-label">Cool</span></button>
+              <button class="emo-btn" onclick="triggerEmotion('idle')"><i data-lucide="circle-dot" class="icon-lg"></i><span class="emo-label">Idle</span></button>
             </div>
           </div>
-
           <div class="cr-section" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
             <div class="cr-title" style="display:flex;justify-content:space-between;align-items:center;">
               <span>VTube Hotkeys</span>
-              <button class="btn btn-secondary btn-sm" onclick="loadHotkeys()">↻</button>
+              <button class="btn btn-secondary btn-sm" onclick="loadHotkeys()"><i data-lucide="refresh-cw" class="icon-sm"></i></button>
             </div>
             <div class="hotkey-list" id="hotkey-list">
-              <div style="color:var(--text3);font-size:12px;text-align:center;padding:20px;">
-                เชื่อมต่อ VTube Studio ก่อนนะคะ
-              </div>
+              <div style="color:var(--text3);font-size:12px;text-align:center;padding:20px;">&#3648;&#3594;&#3639;&#3656;&#3629;&#3617;&#3605;&#3656;&#3629; VTube Studio &#3585;&#3656;&#3629;&#3609;&#3609;&#3632;&#3588;&#3632;</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- PANEL: PERSONA -->
+      <!-- PERSONA PANEL -->
       <div id="panel-persona" class="panel">
-        <div class="section-head" style="padding:24px 24px 0;">🎭 จัดการตัวละคร</div>
+        <div class="section-head" style="padding:24px 24px 0;">&#3592;&#3633;&#3604;&#3585;&#3634;&#3619;&#3605;&#3633;&#3623;&#3621;&#3632;&#3588;&#3619;</div>
         <div style="padding:0 24px 24px;overflow-y:auto;flex:1;">
           <div class="persona-list" id="persona-list"></div>
-          <div class="persona-add" onclick="startNewPersona()">+ เพิ่มตัวละครใหม่</div>
+          <div class="persona-add" onclick="startNewPersona()"><i data-lucide="plus" class="icon"></i> &#3648;&#3614;&#3636;&#3656;&#3617;&#3605;&#3633;&#3623;&#3621;&#3632;&#3588;&#3619;&#3651;&#3627;&#3617;&#3656;</div>
           <div style="margin-top:20px;">
             <div class="persona-editor" id="persona-editor" style="display:none;">
-              <div class="persona-editor-title" id="persona-editor-title">✏️ แก้ไขตัวละคร</div>
+              <div class="persona-editor-title" id="persona-editor-title"><i data-lucide="pencil" class="icon"></i> &#3649;&#3585;&#3657;&#3652;&#3586;&#3605;&#3633;&#3623;&#3621;&#3632;&#3588;&#3619;</div>
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label">Emoji / Icon</label>
-                  <input class="form-input" id="pe-emoji" value="🎭" style="font-size:24px;text-align:center;" maxlength="2">
+                  <label class="form-label">Icon / Symbol</label>
+                  <input class="form-input" id="pe-emoji" value="&#127917;" style="font-size:22px;text-align:center;" maxlength="2">
                 </div>
                 <div class="form-group" style="flex:3;">
-                  <label class="form-label">ชื่อตัวละคร</label>
-                  <input class="form-input" id="pe-name" placeholder="เช่น Sakura-chan, AI Neko...">
+                  <label class="form-label">&#3594;&#3639;&#3656;&#3629;&#3605;&#3633;&#3623;&#3621;&#3632;&#3588;&#3619;</label>
+                  <input class="form-input" id="pe-name" placeholder="&#3648;&#3594;&#3656;&#3609; Sakura-chan, AI Neko...">
                 </div>
               </div>
               <div class="form-group">
-                <label class="form-label">คำอธิบายสั้น</label>
-                <input class="form-input" id="pe-desc" placeholder="เช่น สาว AI สุดน่ารัก ชอบช่วยเหลือคน">
+                <label class="form-label">&#3588;&#3635;&#3629;&#3608;&#3636;&#3610;&#3634;&#3618;&#3626;&#3633;&#3657;&#3609;</label>
+                <input class="form-input" id="pe-desc" placeholder="&#3648;&#3594;&#3656;&#3609; &#3626;&#3634;&#3623; AI &#3626;&#3640;&#3604;&#3609;&#3656;&#3634;&#3619;&#3633;&#3585; &#3594;&#3629;&#3610;&#3594;&#3656;&#3623;&#3618;&#3648;&#3627;&#3621;&#3639;&#3629;&#3588;&#3609;">
               </div>
               <div class="form-group">
-                <label class="form-label">System Prompt (บุคลิกตัวละคร)</label>
-                <textarea class="form-textarea" id="pe-prompt" rows="5"
-                  placeholder="เช่น: คุณคือ Sakura สาว AI น่ารัก ชอบพูดสุภาพและใช้ภาษาญี่ปุ่นผสมบ้าง ตอบสั้นกระชับ ไม่เกิน 3 ประโยค"></textarea>
+                <label class="form-label">System Prompt</label>
+                <textarea class="form-textarea" id="pe-prompt" rows="5" placeholder="&#3648;&#3594;&#3656;&#3609;: &#3588;&#3640;&#3603;&#3588;&#3639;&#3629; Sakura &#3605;&#3629;&#3610;&#3626;&#3633;&#3657;&#3609;&#3585;&#3619;&#3632;&#3594;&#3633;&#3610; &#3652;&#3617;&#3656;&#3648;&#3585;&#3636;&#3609; 3 &#3611;&#3619;&#3632;&#3650;&#3618;&#3588;"></textarea>
               </div>
               <div class="form-group">
-                <label class="form-label">Hotkey Mapping (อารมณ์ → Hotkey ID)</label>
+                <label class="form-label">Hotkey Mapping</label>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                  <div>
-                    <label class="form-label" style="font-size:10px;">😊 Happy</label>
-                    <input class="form-input" id="pe-hk-happy" placeholder="hotkey id...">
-                  </div>
-                  <div>
-                    <label class="form-label" style="font-size:10px;">😢 Sad</label>
-                    <input class="form-input" id="pe-hk-sad" placeholder="hotkey id...">
-                  </div>
-                  <div>
-                    <label class="form-label" style="font-size:10px;">🤩 Excited</label>
-                    <input class="form-input" id="pe-hk-excited" placeholder="hotkey id...">
-                  </div>
-                  <div>
-                    <label class="form-label" style="font-size:10px;">😤 Angry</label>
-                    <input class="form-input" id="pe-hk-angry" placeholder="hotkey id...">
-                  </div>
+                  <div><label class="form-label" style="font-size:10px;">Happy</label><input class="form-input" id="pe-hk-happy" placeholder="hotkey id..."></div>
+                  <div><label class="form-label" style="font-size:10px;">Sad</label><input class="form-input" id="pe-hk-sad" placeholder="hotkey id..."></div>
+                  <div><label class="form-label" style="font-size:10px;">Excited</label><input class="form-input" id="pe-hk-excited" placeholder="hotkey id..."></div>
+                  <div><label class="form-label" style="font-size:10px;">Angry</label><input class="form-input" id="pe-hk-angry" placeholder="hotkey id..."></div>
                 </div>
               </div>
               <div class="btn-group">
-                <button class="btn btn-primary" onclick="savePersona()">💾 บันทึก</button>
-                <button class="btn btn-secondary" onclick="cancelPersonaEdit()">ยกเลิก</button>
-                <button class="btn btn-danger" id="btn-delete-persona" onclick="deletePersona()" style="display:none;">🗑 ลบ</button>
+                <button class="btn btn-primary" onclick="savePersona()"><i data-lucide="save" class="icon-sm"></i> &#3610;&#3633;&#3609;&#3607;&#3638;&#3585;</button>
+                <button class="btn btn-secondary" onclick="cancelPersonaEdit()">&#3618;&#3585;&#3648;&#3621;&#3636;&#3585;</button>
+                <button class="btn btn-danger" id="btn-delete-persona" onclick="deletePersona()" style="display:none;"><i data-lucide="trash-2" class="icon-sm"></i> &#3621;&#3610;</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- PANEL: SETTINGS -->
+      <!-- SETTINGS PANEL -->
       <div id="panel-settings" class="panel">
-        <div class="section-head" style="padding:24px 24px 0;">⚙️ ตั้งค่าระบบ</div>
+        <div class="section-head" style="padding:24px 24px 0;">&#3605;&#3633;&#3657;&#3591;&#3588;&#3656;&#3634;&#3619;&#3632;&#3610;&#3610;</div>
         <div style="padding:0 24px 24px;overflow-y:auto;flex:1;">
         <div class="settings-grid">
 
-          <!-- LM Studio Card -->
           <div class="settings-card">
-            <div class="card-title">
-              <span class="card-icon">🧠</span> LM Studio API
-              <span class="card-badge" id="badge-lm" class="badge-disconnected">ไม่ได้เชื่อมต่อ</span>
-            </div>
-            <div class="form-group">
-              <label class="form-label">API URL</label>
-              <input class="form-input" id="lm-url" placeholder="http://26.249.45.186:1234" value="http://localhost:1234">
-              <div class="hint">URL ของ LM Studio server เช่น http://192.168.1.100:1234</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">API Key (ถ้ามี)</label>
-              <input class="form-input" id="lm-apikey" placeholder="ไม่บังคับ / lm-studio" type="password">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Temperature</label>
-              <div class="slider-row">
-                <input type="range" class="form-slider" id="lm-temp" min="0" max="2" step="0.05" value="0.8" oninput="document.getElementById('lm-temp-val').textContent=this.value">
-                <span class="slider-val" id="lm-temp-val">0.8</span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Max Tokens</label>
-              <div class="slider-row">
-                <input type="range" class="form-slider" id="lm-maxtok" min="64" max="2048" step="64" value="512" oninput="document.getElementById('lm-maxtok-val').textContent=this.value">
-                <span class="slider-val" id="lm-maxtok-val">512</span>
-              </div>
-            </div>
+            <div class="card-title"><span class="card-icon"><i data-lucide="cpu" class="icon-lg"></i></span> LM Studio API <span class="card-badge badge-disconnected" id="badge-lm">&#3652;&#3617;&#3656;&#3652;&#3604;&#3657;&#3648;&#3594;&#3639;&#3656;&#3629;&#3617;&#3605;&#3656;&#3629;</span></div>
+            <div class="form-group"><label class="form-label">API URL</label><input class="form-input" id="lm-url" placeholder="http://26.249.45.186:1234" value="http://localhost:1234"><div class="hint">URL &#3586;&#3629;&#3591; LM Studio server</div></div>
+            <div class="form-group"><label class="form-label">API Key</label><input class="form-input" id="lm-apikey" placeholder="&#3652;&#3617;&#3656;&#3610;&#3633;&#3591;&#3588;&#3633;&#3610; / lm-studio" type="password"></div>
+            <div class="form-group"><label class="form-label">Temperature</label><div class="slider-row"><input type="range" class="form-slider" id="lm-temp" min="0" max="2" step="0.05" value="0.8" oninput="document.getElementById('lm-temp-val').textContent=this.value"><span class="slider-val" id="lm-temp-val">0.8</span></div></div>
+            <div class="form-group"><label class="form-label">Max Tokens</label><div class="slider-row"><input type="range" class="form-slider" id="lm-maxtok" min="64" max="2048" step="64" value="512" oninput="document.getElementById('lm-maxtok-val').textContent=this.value"><span class="slider-val" id="lm-maxtok-val">512</span></div></div>
             <div class="btn-group">
-              <button class="btn btn-primary" onclick="testLMStudio()">🔌 ทดสอบ</button>
-              <button class="btn btn-secondary" onclick="saveSettings()">💾 บันทึก</button>
+              <button class="btn btn-primary" onclick="testLMStudio()"><i data-lucide="plug" class="icon-sm"></i> &#3607;&#3604;&#3626;&#3629;&#3610;</button>
+              <button class="btn btn-secondary" onclick="saveSettings()"><i data-lucide="save" class="icon-sm"></i> &#3610;&#3633;&#3609;&#3607;&#3638;&#3585;</button>
             </div>
           </div>
 
-          <!-- VTube Studio Card -->
           <div class="settings-card">
-            <div class="card-title">
-              <span class="card-icon">🎌</span> VTube Studio
-              <span class="card-badge badge-disconnected" id="badge-vtube">ไม่ได้เชื่อมต่อ</span>
-            </div>
-            <div class="form-group">
-              <label class="form-label">WebSocket URL</label>
-              <input class="form-input" id="vtube-url" placeholder="ws://localhost:8001" value="ws://localhost:8001">
-              <div class="hint">Port ของ VTube Studio API (ปกติ 8001)</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Auto-trigger emotion จาก AI response</label>
-              <select class="form-select" id="vtube-auto-emo">
-                <option value="1">✅ เปิดใช้งาน</option>
-                <option value="0">❌ ปิด</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">ขยับโมเดลเมื่อพูด</label>
-              <select class="form-select" id="vtube-auto-move">
-                <option value="1">✅ เปิดใช้งาน</option>
-                <option value="0">❌ ปิด</option>
-              </select>
-            </div>
+            <div class="card-title"><span class="card-icon"><i data-lucide="monitor-play" class="icon-lg"></i></span> VTube Studio <span class="card-badge badge-disconnected" id="badge-vtube">&#3652;&#3617;&#3656;&#3652;&#3604;&#3657;&#3648;&#3594;&#3639;&#3656;&#3629;&#3617;&#3605;&#3656;&#3629;</span></div>
+            <div class="form-group"><label class="form-label">WebSocket URL</label><input class="form-input" id="vtube-url" placeholder="ws://localhost:8001" value="ws://localhost:8001"><div class="hint">Port &#3586;&#3629;&#3591; VTube Studio API (&#3611;&#3585;&#3605;&#3636; 8001)</div></div>
+            <div class="form-group"><label class="form-label">Auto-trigger emotion</label><select class="form-select" id="vtube-auto-emo"><option value="1">&#3648;&#3611;&#3636;&#3604;&#3651;&#3594;&#3657;&#3591;&#3634;&#3609;</option><option value="0">&#3611;&#3636;&#3604;</option></select></div>
+            <div class="form-group"><label class="form-label">&#3586;&#3618;&#3633;&#3610;&#3650;&#3617;&#3648;&#3604;&#3621;&#3648;&#3617;&#3639;&#3656;&#3629;&#3614;&#3641;&#3604;</label><select class="form-select" id="vtube-auto-move"><option value="1">&#3648;&#3611;&#3636;&#3604;&#3651;&#3594;&#3657;&#3591;&#3634;&#3609;</option><option value="0">&#3611;&#3636;&#3604;</option></select></div>
             <div class="btn-group">
-              <button class="btn btn-primary" id="btn-vtube-connect" onclick="connectVTube()">🔌 เชื่อมต่อ</button>
-              <button class="btn btn-secondary" onclick="loadHotkeys()">📋 โหลด Hotkeys</button>
+              <button class="btn btn-primary" id="btn-vtube-connect" onclick="connectVTube()"><i data-lucide="plug" class="icon-sm"></i> &#3648;&#3594;&#3639;&#3656;&#3629;&#3617;&#3605;&#3656;&#3629;</button>
+              <button class="btn btn-secondary" onclick="loadHotkeys()"><i data-lucide="list" class="icon-sm"></i> &#3650;&#3627;&#3621;&#3604; Hotkeys</button>
             </div>
             <div style="margin-top:10px;" id="vtube-status-text"></div>
           </div>
 
-          <!-- TTS Card -->
           <div class="settings-card">
-            <div class="card-title">
-              <span class="card-icon">🔊</span> Text-to-Speech (TTS)
-            </div>
-            <div class="form-group">
-              <label class="form-label">ระบบ TTS</label>
-              <select class="form-select" id="tts-engine" onchange="onTTSEngineChange()">
-                <option value="system">System TTS (ใช้งานได้เลย)</option>
-                <option value="vtube">VTube Studio Mouth Sync</option>
-                <option value="off">ปิด TTS</option>
-              </select>
-            </div>
-            <div class="form-group" id="tts-voice-group">
-              <label class="form-label">Voice / เสียง</label>
-              <select class="form-select" id="tts-voice">
-                <option value="">Default</option>
-              </select>
-              <button class="btn btn-secondary btn-sm" style="margin-top:6px;" onclick="loadVoices()">↻ โหลดเสียง</button>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Speed / ความเร็ว</label>
-              <div class="slider-row">
-                <input type="range" class="form-slider" id="tts-rate" min="0.5" max="2" step="0.1" value="1.0" oninput="document.getElementById('tts-rate-val').textContent=this.value+'x'">
-                <span class="slider-val" id="tts-rate-val">1.0x</span>
-              </div>
-            </div>
+            <div class="card-title"><span class="card-icon"><i data-lucide="volume-2" class="icon-lg"></i></span> Text-to-Speech (TTS)</div>
+            <div class="form-group"><label class="form-label">&#3619;&#3632;&#3610;&#3610; TTS</label><select class="form-select" id="tts-engine" onchange="onTTSEngineChange()"><option value="system">System TTS</option><option value="edge-rvc">Edge TTS + RVC</option><option value="vtube">VTube Studio Mouth Sync</option><option value="off">&#3611;&#3636;&#3604; TTS</option></select></div>
+            <div class="form-group" id="tts-voice-group"><label class="form-label">Voice / &#3648;&#3626;&#3637;&#3618;&#3591;</label><select class="form-select" id="tts-voice"><option value="">Default</option></select><button class="btn btn-secondary btn-sm" style="margin-top:6px;" onclick="loadVoices()"><i data-lucide="refresh-cw" class="icon-sm"></i> &#3650;&#3627;&#3621;&#3604;&#3648;&#3626;&#3637;&#3618;&#3591;</button></div>
+            <div class="form-group"><label class="form-label">Speed</label><div class="slider-row"><input type="range" class="form-slider" id="tts-rate" min="0.5" max="2" step="0.1" value="1.0" oninput="document.getElementById('tts-rate-val').textContent=this.value+'x'"><span class="slider-val" id="tts-rate-val">1.0x</span></div></div>
             <div class="btn-group">
-              <button class="btn btn-secondary" onclick="testTTS()">🎤 ทดสอบเสียง</button>
-              <button class="btn btn-danger btn-sm" onclick="api.ttsStop()">⏹ หยุด</button>
+              <button class="btn btn-secondary" onclick="testTTS()"><i data-lucide="mic" class="icon-sm"></i> &#3607;&#3604;&#3626;&#3629;&#3610;&#3648;&#3626;&#3637;&#3618;&#3591;</button>
+              <button class="btn btn-danger btn-sm" onclick="api.ttsStop()"><i data-lucide="square" class="icon-sm"></i> &#3627;&#3618;&#3640;&#3604;</button>
             </div>
           </div>
 
-          <!-- Voice Model Card -->
           <div class="settings-card">
-            <div class="card-title">
-              <span class="card-icon">🎵</span> Voice Model (.pth / VITS)
-              <span class="tag tag-purple" style="margin-left:auto;font-size:9px;">BETA</span>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Voice Model File (.pth)</label>
-              <div class="file-picker">
-                <input class="form-input" id="pth-path" placeholder="เลือกไฟล์ .pth ..." readonly>
-                <button class="btn btn-secondary" onclick="selectPthFile()">📁 เลือก</button>
-              </div>
-              <div class="file-display" id="pth-display">ยังไม่ได้เลือกไฟล์</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Config File (.json)</label>
-              <div class="file-picker">
-                <input class="form-input" id="cfg-path" placeholder="เลือกไฟล์ config.json ..." readonly>
-                <button class="btn btn-secondary" onclick="selectCfgFile()">📁 เลือก</button>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">VITS/RVC Server URL (ถ้ามี)</label>
-              <input class="form-input" id="vits-url" placeholder="http://localhost:5000">
-              <div class="hint">หากใช้ RVC หรือ VITS server แยก ให้ใส่ URL ที่นี่</div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Speaker ID</label>
-              <input class="form-input" id="vits-speaker" placeholder="0" type="number" value="0">
-            </div>
+            <div class="card-title"><span class="card-icon"><i data-lucide="music-2" class="icon-lg"></i></span> Voice Model (.pth / VITS) <span class="tag tag-purple" style="margin-left:auto;font-size:9px;">BETA</span></div>
+            <div class="form-group"><label class="form-label">Voice Model (.pth)</label><div class="file-picker"><input class="form-input" id="pth-path" placeholder="&#3648;&#3621;&#3639;&#3629;&#3585;&#3652;&#3615;&#3621;&#3660; .pth ..." readonly><button class="btn btn-secondary" onclick="selectPthFile()"><i data-lucide="folder-open" class="icon-sm"></i> &#3648;&#3621;&#3639;&#3629;&#3585;</button></div><div class="file-display" id="pth-display">&#3618;&#3633;&#3591;&#3652;&#3617;&#3656;&#3652;&#3604;&#3657;&#3648;&#3621;&#3639;&#3629;&#3585;&#3652;&#3615;&#3621;&#3660;</div></div>
+            <div class="form-group"><label class="form-label">Config (.json)</label><div class="file-picker"><input class="form-input" id="cfg-path" placeholder="config.json ..." readonly><button class="btn btn-secondary" onclick="selectCfgFile()"><i data-lucide="folder-open" class="icon-sm"></i> &#3648;&#3621;&#3639;&#3629;&#3585;</button></div></div>
+            <div class="form-group"><label class="form-label">RVC Runtime</label><select class="form-select" id="rvc-runtime"><option value="server">Server (RVC WebUI)</option><option value="local-cpu">Local CPU</option></select></div>
+            <div class="form-group"><label class="form-label">RVC Pitch Shift</label><input class="form-input" id="rvc-pitch" type="number" value="0" min="-24" max="24"></div>
+            <div class="form-group"><label class="form-label">RVC Model Name</label><input class="form-input" id="rvc-model" placeholder="e.g. chaaym_v1.pth"></div>
+            <div class="form-group"><label class="form-label">RVC Index (.index)</label><div class="file-picker"><input class="form-input" id="rvc-index-path" placeholder=".index ..." readonly><button class="btn btn-secondary" onclick="selectRvcIndexFile()"><i data-lucide="folder-open" class="icon-sm"></i> &#3648;&#3621;&#3639;&#3629;&#3585;</button></div></div>
+            <div class="form-group"><label class="form-label">Speaker ID</label><input class="form-input" id="vits-speaker" type="number" value="0"></div>
             <div class="btn-group">
-              <button class="btn btn-secondary" onclick="testVITS()">🎤 ทดสอบ</button>
-              <button class="btn btn-primary" onclick="saveSettings()">💾 บันทึก</button>
+              <button class="btn btn-secondary" onclick="testVITS()"><i data-lucide="mic" class="icon-sm"></i> &#3607;&#3604;&#3626;&#3629;&#3610;</button>
+              <button class="btn btn-primary" onclick="saveSettings()"><i data-lucide="save" class="icon-sm"></i> &#3610;&#3633;&#3609;&#3607;&#3638;&#3585;</button>
             </div>
           </div>
 
-          <!-- AI Behavior Card -->
           <div class="settings-card">
-            <div class="card-title">
-              <span class="card-icon">🤖</span> พฤติกรรม AI
-            </div>
-            <div class="form-group">
-              <label class="form-label">ภาษาหลัก</label>
-              <select class="form-select" id="ai-lang">
-                <option value="th">🇹🇭 ภาษาไทย</option>
-                <option value="jp">🇯🇵 ภาษาญี่ปุ่น</option>
-                <option value="en">🇬🇧 ภาษาอังกฤษ</option>
-                <option value="mix">🌏 ผสม (ไทย+อื่น)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">จำประวัติการสนทนา (messages)</label>
-              <div class="slider-row">
-                <input type="range" class="form-slider" id="ai-memory" min="2" max="50" step="2" value="10" oninput="document.getElementById('ai-memory-val').textContent=this.value">
-                <span class="slider-val" id="ai-memory-val">10</span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Detect emotion จาก AI text</label>
-              <select class="form-select" id="ai-emo-detect">
-                <option value="1">✅ เปิด (auto trigger VTube)</option>
-                <option value="0">❌ ปิด</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Stream response</label>
-              <select class="form-select" id="ai-stream">
-                <option value="0">❌ ปิด (รอจน complete)</option>
-                <option value="1">✅ เปิด (แสดงทีละตัว)</option>
-              </select>
-            </div>
-            <div class="btn-group">
-              <button class="btn btn-primary btn-full" onclick="saveSettings()">💾 บันทึกการตั้งค่า</button>
-            </div>
+            <div class="card-title"><span class="card-icon"><i data-lucide="bot" class="icon-lg"></i></span> &#3614;&#3624;&#3604;&#3636;&#3585;&#3619;&#3619;&#3617; AI</div>
+            <div class="form-group"><label class="form-label">&#3616;&#3634;&#3625;&#3634;&#3627;&#3621;&#3633;&#3585;</label><select class="form-select" id="ai-lang"><option value="th">&#3616;&#3634;&#3625;&#3634;&#3652;&#3607;&#3618;</option><option value="jp">&#3616;&#3634;&#3625;&#3634;&#3597;&#3637;&#3656;&#3611;&#3640;&#3656;&#3609;</option><option value="en">&#3616;&#3634;&#3625;&#3634;&#3629;&#3633;&#3591;&#3585;&#3624;&#3625;</option><option value="mix">&#3612;&#3626;&#3617; (&#3652;&#3607;&#3618;+&#3629;&#3639;&#3656;&#3609;)</option></select></div>
+            <div class="form-group"><label class="form-label">&#3592;&#3635;&#3611;&#3619;&#3632;&#3623;&#3633;&#3605;&#3636;&#3585;&#3634;&#3619;&#3626;&#3609;&#3607;&#3609;&#3634; (messages)</label><div class="slider-row"><input type="range" class="form-slider" id="ai-memory" min="2" max="50" step="2" value="10" oninput="document.getElementById('ai-memory-val').textContent=this.value"><span class="slider-val" id="ai-memory-val">10</span></div></div>
+            <div class="form-group"><label class="form-label">Detect emotion</label><select class="form-select" id="ai-emo-detect"><option value="1">&#3648;&#3611;&#3636;&#3604; (auto trigger VTube)</option><option value="0">&#3611;&#3636;&#3604;</option></select></div>
+            <div class="form-group"><label class="form-label">Stream response</label><select class="form-select" id="ai-stream"><option value="0">&#3611;&#3636;&#3604; (&#3619;&#3629;&#3592;&#3609; complete)</option><option value="1">&#3648;&#3611;&#3636;&#3604; (&#3649;&#3626;&#3604;&#3591;&#3607;&#3637;&#3621;&#3632;&#3605;&#3633;&#3623;)</option></select></div>
+            <div class="btn-group"><button class="btn btn-primary btn-full" onclick="saveSettings()"><i data-lucide="save" class="icon-sm"></i> &#3610;&#3633;&#3609;&#3607;&#3638;&#3585;&#3585;&#3634;&#3619;&#3605;&#3633;&#3657;&#3591;&#3588;&#3656;&#3634;</button></div>
           </div>
 
-          <!-- Debug Card -->
           <div class="settings-card">
-            <div class="card-title"><span class="card-icon">🛠</span> Debug & ข้อมูล</div>
-            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;font-family:var(--mono);font-size:11px;color:var(--text2);max-height:160px;overflow-y:auto;" id="debug-log">
-              -- log จะแสดงที่นี่ --
-            </div>
+            <div class="card-title"><span class="card-icon"><i data-lucide="bug" class="icon-lg"></i></span> Debug &amp; &#3586;&#3657;&#3629;&#3617;&#3641;&#3621;</div>
+            <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:12px;font-family:var(--mono);font-size:11px;color:var(--text2);max-height:160px;overflow-y:auto;" id="debug-log">-- log --</div>
             <div class="btn-group" style="margin-top:10px;">
-              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('debug-log').textContent='-- cleared --'">🗑 ล้าง log</button>
-              <button class="btn btn-secondary btn-sm" onclick="saveSettings()">💾 บันทึกทั้งหมด</button>
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('debug-log').textContent='-- cleared --'"><i data-lucide="trash-2" class="icon-sm"></i> &#3621;&#3657;&#3634;&#3591; log</button>
+              <button class="btn btn-secondary btn-sm" onclick="saveSettings()"><i data-lucide="save" class="icon-sm"></i> &#3610;&#3633;&#3609;&#3607;&#3638;&#3585;&#3607;&#3633;&#3657;&#3591;&#3627;&#3617;&#3604;</button>
             </div>
           </div>
 
-        </div><!-- /settings-grid -->
         </div>
-      </div><!-- /panel-settings -->
+        </div>
+      </div>
 
-    </div><!-- /content -->
-  </div><!-- /layout -->
-
-  <!-- STATUS BAR -->
-  <div id="statusbar">
-    <div class="status-item">
-      <div class="status-dot off" id="dot-lm"></div>
-      <span class="label">LM Studio</span>
-      <span class="val err" id="val-lm">ไม่ได้เชื่อมต่อ</span>
     </div>
-    <div class="status-item">
-      <div class="status-dot off" id="dot-vtube"></div>
-      <span class="label">VTube</span>
-      <span class="val err" id="val-vtube">ไม่ได้เชื่อมต่อ</span>
-    </div>
-    <div class="status-item">
-      <div class="status-dot off" id="dot-tts"></div>
-      <span class="label">TTS</span>
-      <span class="val" id="val-tts">ปิด</span>
-    </div>
-    <div id="status-log">พร้อมใช้งาน ✨</div>
   </div>
 
-</div><!-- /app -->
-
+  <div id="statusbar">
+    <div class="status-item"><div class="status-dot off" id="dot-lm"></div><span class="label">LM Studio</span><span class="val err" id="val-lm">&#3652;&#3617;&#3656;&#3652;&#3604;&#3657;&#3648;&#3594;&#3639;&#3656;&#3629;&#3617;&#3605;&#3656;&#3629;</span></div>
+    <div class="status-item"><div class="status-dot off" id="dot-vtube"></div><span class="label">VTube</span><span class="val err" id="val-vtube">&#3652;&#3617;&#3656;&#3652;&#3604;&#3657;&#3648;&#3594;&#3639;&#3656;&#3629;&#3617;&#3605;&#3656;&#3629;</span></div>
+    <div class="status-item"><div class="status-dot off" id="dot-tts"></div><span class="label">TTS</span><span class="val" id="val-tts">&#3611;&#3636;&#3604;</span></div>
+    <div id="status-log">&#3614;&#3619;&#3657;&#3629;&#3617;&#3651;&#3594;&#3657;&#3591;&#3634;&#3609;</div>
+  </div>
+</div>
 <div id="toast-container"></div>
-
+<script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld('api', {
   onVtubeMessage: (cb) => ipcRenderer.on('vtube-message', (_, d) => cb(d)),
 
   // TTS
+  rvcSpeak: (opts) => ipcRenderer.invoke('rvc-speak', opts),
   ttsSpeak: (opts) => ipcRenderer.invoke('tts-speak', opts),
   ttsGetVoices: () => ipcRenderer.invoke('tts-get-voices'),
   ttsStop: () => ipcRenderer.invoke('tts-stop'),

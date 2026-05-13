@@ -27,6 +27,10 @@ const state = {
     ttsRate: 1.0,
     vitsUrl: '',
     vitsSpeaker: 0,
+    rvcRuntime: 'server',
+    rvcPitch: 0,
+    rvcModel: '',
+    rvcIndexPath: '',
     pthPath: '',
     cfgPath: '',
     aiLang: 'th',
@@ -50,6 +54,7 @@ const emotionKeywords = {
 
 // ── Init ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  if (typeof lucide !== 'undefined') lucide.createIcons();
   initChatElements();
   document.getElementById('welcome-time').textContent = formatTime(new Date());
   await loadSettings();
@@ -87,7 +92,12 @@ function toast(msg, type = 'info', duration = 3000) {
   const c = document.getElementById('toast-container');
   const t = document.createElement('div');
   t.className = `toast toast-${type}`;
-  t.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span> ${msg}`;
+  const icons = {
+    success: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    error:   '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+    info:    '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+  };
+  t.innerHTML = `<span>${icons[type] || icons.info}</span> ${msg}`;
   c.appendChild(t);
   setTimeout(() => { t.style.animation = 'none'; t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, duration);
 }
@@ -124,7 +134,7 @@ async function saveSettings() {
     currentPersonaIdx: state.currentPersona ? state.personas.indexOf(state.currentPersona) : -1,
   };
   const res = await api.settingsSave(data);
-  if (res.success) toast('บันทึกการตั้งค่าแล้ว ✨', 'success');
+  if (res.success) toast('บันทึกการตั้งค่าแล้ว', 'success');
   else toast('บันทึกไม่สำเร็จ: ' + res.error, 'error');
 }
 
@@ -146,6 +156,10 @@ function collectSettingsFromUI() {
   state.settings.ttsRate = parseFloat(document.getElementById('tts-rate').value);
   state.settings.vitsUrl = document.getElementById('vits-url').value.trim();
   state.settings.vitsSpeaker = parseInt(document.getElementById('vits-speaker').value);
+  state.settings.rvcRuntime = document.getElementById('rvc-runtime')?.value || 'server';
+  state.settings.rvcPitch = parseInt(document.getElementById('rvc-pitch')?.value) || 0;
+  state.settings.rvcModel = document.getElementById('rvc-model')?.value?.trim() || '';
+  state.settings.rvcIndexPath = document.getElementById('rvc-index-path')?.value?.trim() || '';
   state.settings.aiLang = document.getElementById('ai-lang').value;
   state.settings.aiMemory = parseInt(document.getElementById('ai-memory').value);
   state.settings.aiEmoDetect = document.getElementById('ai-emo-detect').value === '1';
@@ -168,6 +182,10 @@ function applySettingsToUI() {
   document.getElementById('tts-rate-val').textContent = (s.ttsRate || 1.0) + 'x';
   setVal('vits-url', s.vitsUrl || '');
   setVal('vits-speaker', s.vitsSpeaker || 0);
+  setVal('rvc-runtime', s.rvcRuntime || 'server');
+  setVal('rvc-pitch', s.rvcPitch || 0);
+  setVal('rvc-model', s.rvcModel || '');
+  setVal('rvc-index-path', s.rvcIndexPath || '');
   setVal('pth-path', s.pthPath || '');
   setVal('cfg-path', s.cfgPath || '');
   setVal('ai-lang', s.aiLang || 'th');
@@ -376,7 +394,7 @@ async function sendMessage() {
       }, resetDelay);
     }
   } else {
-    appendMessage('ai', `❌ เกิดข้อผิดพลาด: ${res.error}\n\nตรวจสอบว่า LM Studio กำลังทำงานอยู่นะคะ`);
+    appendMessage('ai', `เกิดข้อผิดพลาด: ${res.error}\n\nตรวจสอบว่า LM Studio กำลังทำงานอยู่นะคะ`);
     log('LM error: ' + res.error);
   }
 }
@@ -420,14 +438,16 @@ function appendMessage(role, text) {
   if (!chatMessages) chatMessages = document.getElementById('chat-messages');
   const isUser = role === 'user';
   const persona = state.currentPersona;
-  const avatar = isUser ? '🧑' : (persona?.emoji || '🤖');
+  const BOT_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>';
+  const USER_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>';
+  const avatarHTML = isUser ? USER_SVG : (persona?.emoji ? `<span style="font-size:16px;line-height:1">${persona.emoji}</span>` : BOT_SVG);
 
   const div = document.createElement('div');
   div.className = 'msg ' + role;
 
   const avatarEl = document.createElement('div');
   avatarEl.className = 'msg-avatar';
-  avatarEl.textContent = avatar;
+  avatarEl.innerHTML = avatarHTML;
 
   const wrapper = document.createElement('div');
 
@@ -454,9 +474,11 @@ function appendTyping(id) {
   div.className = 'msg ai';
   div.id = id;
 
+  const BOT_SVG2 = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>';
   const avatarEl = document.createElement('div');
   avatarEl.className = 'msg-avatar';
-  avatarEl.textContent = state.currentPersona?.emoji || '🤖';
+  const pe = state.currentPersona?.emoji;
+  avatarEl.innerHTML = pe ? `<span style="font-size:16px;line-height:1">${pe}</span>` : BOT_SVG2;
 
   const wrapper = document.createElement('div');
   const bubble = document.createElement('div');
@@ -479,13 +501,15 @@ function removeTyping(id) {
 function setGenerating(val) {
   isGenerating = val;
   btnSend.disabled = val;
-  btnSend.textContent = val ? '⏸' : '▶';
+  btnSend.innerHTML = val
+    ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect width="6" height="14" x="4" y="5" rx="1"/><rect width="6" height="14" x="14" y="5" rx="1"/></svg>'
+    : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
 }
 
 function clearChat() {
   state.chatHistory = [];
   chatMessages.innerHTML = '';
-  appendMessage('ai', '🗑 ล้างประวัติการสนทนาแล้วค่ะ เริ่มต้นใหม่ได้เลย!');
+  appendMessage('ai', 'ล้างประวัติการสนทนาแล้วค่ะ เริ่มต้นใหม่ได้เลย!');
 }
 
 function escapeHtml(t) {
@@ -514,7 +538,7 @@ async function connectVTube() {
   const res = await api.vtubeConnect({ wsUrl: url });
 
   document.getElementById('btn-vtube-connect').disabled = false;
-  document.getElementById('btn-vtube-connect').textContent = '🔌 เชื่อมต่อ';
+  document.getElementById('btn-vtube-connect').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V16M12 8V2M5 12H2M22 12H19M19 12a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/></svg> เชื่อมต่อ';
 
   if (res.success) {
     log('VTube Studio: กำลังรอ authentication จาก VTube Studio app...');
@@ -535,7 +559,7 @@ function updateVtubeStatusUI() {
     dot.className = 'status-dot on';
     val.textContent = 'เชื่อมต่อแล้ว'; val.className = 'val ok';
     badge.textContent = 'เชื่อมต่อแล้ว'; badge.className = 'card-badge badge-connected';
-    text.innerHTML = '<span style="color:var(--green)">✅ เชื่อมต่อและ authenticated สำเร็จ</span>';
+    text.innerHTML = '<span style="color:var(--green)">เชื่อมต่อและ authenticated สำเร็จ</span>';
   } else if (state.vtubeConnected) {
     dot.className = 'status-dot loading';
     val.textContent = 'รอ Auth'; val.className = 'val';
@@ -590,7 +614,7 @@ async function loadHotkeys() {
       list.appendChild(div);
     });
     log(`VTube: โหลด hotkeys สำเร็จ ${res.hotkeys.length} รายการ — AI จะใช้ได้เลย`);
-    toast(`โหลด ${res.hotkeys.length} hotkeys สำเร็จ AI จะเลือกใช้เองได้แล้ว ✨`, 'success', 3000);
+    toast(`โหลด ${res.hotkeys.length} hotkeys สำเร็จ`, 'success', 3000);
   } else {
     state.availableHotkeys = [];
     list.innerHTML = '<div style="color:var(--text3);font-size:12px;text-align:center;padding:20px;">ไม่พบ Hotkeys หรือยังไม่ได้ตั้งค่าใน VTube Studio</div>';
@@ -633,7 +657,7 @@ function toggleTTS() {
   btn.classList.toggle('active', state.ttsEnabled);
   btn.title = state.ttsEnabled ? 'TTS เปิดอยู่ (คลิกเพื่อปิด)' : 'เปิด TTS';
   updateTTSStatus();
-  toast(state.ttsEnabled ? '🔊 TTS เปิดแล้ว' : '🔇 TTS ปิดแล้ว', 'info', 1500);
+  toast(state.ttsEnabled ? 'TTS เปิดแล้ว' : 'TTS ปิดแล้ว', 'info', 1500);
 }
 
 function updateTTSStatus() {
@@ -672,9 +696,79 @@ async function testTTS() {
   await speakText(text);
 }
 
+const EDGE_RVC_PRESET = Object.freeze({
+  edgeVoice: 'th-TH-PremwadeeNeural',
+  edgeRate: '+3%',
+  edgePitch: '+60Hz',
+  edgeVolume: '+6%',
+  f0method: 'harvest',
+  indexRate: 0.9,
+  protect: 0.28,
+  rmsMixRate: 0.9,
+  filterRadius: 3,
+  resampleSr: 0,
+});
+
+function toAudioUrl(pathOrUrl) {
+  const raw = String(pathOrUrl || '').trim();
+  if (!raw) return '';
+  if (/^(https?:|file:|blob:|data:)/i.test(raw)) return raw;
+  const norm = raw.replace(/\\/g, '/');
+  if (/^[A-Za-z]:\//.test(norm)) return `file:///${norm}`;
+  return `file://${norm}`;
+}
+
+async function playAudioPath(pathOrUrl) {
+  const src = toAudioUrl(pathOrUrl);
+  if (!src) throw new Error('Empty audio path');
+  await new Promise((resolve, reject) => {
+    const audio = new Audio(src);
+    setSpeaking(true);
+    audio.onended = () => { setSpeaking(false); resolve(); };
+    audio.onerror = () => { setSpeaking(false); reject(new Error('Audio playback failed')); };
+    audio.play().catch((e) => { setSpeaking(false); reject(e); });
+  });
+}
+
+async function speakWithRvc(text) {
+  const runtime = state.settings.rvcRuntime || 'server';
+  const rvcUrl = state.settings.vitsUrl || '';
+  if (runtime === 'server' && !rvcUrl) {
+    toast('กรุณาใส่ RVC Server URL ก่อน', 'error');
+    return false;
+  }
+
+  const res = await api.rvcSpeak({
+    text,
+    runtime,
+    rvcUrl,
+    pitch: Number(state.settings.rvcPitch || 0),
+    modelName: state.settings.rvcModel || '',
+    modelPath: state.settings.pthPath || '',
+    indexPath: state.settings.rvcIndexPath || '',
+    ...EDGE_RVC_PRESET,
+  });
+
+  if (!res?.success || !res.audioPath) {
+    log('RVC error: ' + (res?.error || 'unknown'));
+    toast('RVC แปลงเสียงไม่สำเร็จ', 'error');
+    return false;
+  }
+
+  await playAudioPath(res.audioPath);
+  return true;
+}
+
 async function speakText(text) {
   const engine = state.settings.ttsEngine || 'system';
   if (engine === 'off') return;
+  const cleanText = String(text || '').replace(/[*_#`]/g, '').replace(/\n/g, ' ').trim();
+  if (!cleanText) return;
+
+  if (engine === 'edge-rvc') {
+    await speakWithRvc(cleanText);
+    return;
+  }
 
   // Try VITS server first if configured
   if (engine === 'system' && state.settings.vitsUrl) {
@@ -682,7 +776,7 @@ async function speakText(text) {
       const r = await fetch(`${state.settings.vitsUrl}/voice`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, speaker_id: state.settings.vitsSpeaker || 0 }),
+        body: JSON.stringify({ text: cleanText, speaker_id: state.settings.vitsSpeaker || 0 }),
       });
       if (r.ok) {
         const blob = await r.blob();
@@ -697,10 +791,9 @@ async function speakText(text) {
   }
 
   // System TTS fallback
-  const cleanText = text.replace(/[*_#`]/g, '').replace(/\n/g, ' ').substring(0, 300);
   setSpeaking(true);
   const res = await api.ttsSpeak({
-    text: cleanText,
+    text: cleanText.substring(0, 300),
     voice: state.settings.ttsVoice || null,
     rate: state.settings.ttsRate || 1.0,
   });
@@ -731,7 +824,7 @@ async function testVITS() {
       const blob = await r.blob();
       const audioUrl = URL.createObjectURL(blob);
       new Audio(audioUrl).play();
-      toast('VITS ทดสอบสำเร็จ 🎵', 'success');
+      toast('VITS ทดสอบสำเร็จ', 'success');
     } else {
       toast('VITS server ตอบกลับผิดพลาด: ' + r.status, 'error');
     }
@@ -763,6 +856,19 @@ async function selectCfgFile() {
     document.getElementById('cfg-path').value = res.filePath;
     state.settings.cfgPath = res.filePath;
     log('เลือกไฟล์ config: ' + res.filePath);
+  }
+}
+
+async function selectRvcIndexFile() {
+  const res = await api.openFileDialog({ filters: [
+    { name: 'RVC Index', extensions: ['index'] },
+    { name: 'All Files', extensions: ['*'] }
+  ]});
+  if (!res.canceled && res.filePath) {
+    const el = document.getElementById('rvc-index-path');
+    if (el) el.value = res.filePath;
+    state.settings.rvcIndexPath = res.filePath;
+    log('เลือกไฟล์ .index: ' + res.filePath);
   }
 }
 
@@ -800,8 +906,8 @@ function renderPersonaList() {
       <div class="persona-card-name">${escapeHtml(p.name)}</div>
       <div class="persona-card-desc">${escapeHtml(p.desc)}</div>
       <div style="margin-top:8px;display:flex;gap:6px;justify-content:center;">
-        <button class="btn btn-primary btn-sm" onclick="selectPersona(${i})">✓ ใช้งาน</button>
-        <button class="btn btn-secondary btn-sm" onclick="editPersona(${i})">✏️</button>
+        <button class="btn btn-primary btn-sm" onclick="selectPersona(${i})"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ใช้งาน</button>
+        <button class="btn btn-secondary btn-sm" onclick="editPersona(${i})" title="แก้ไข"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
       </div>
     `;
     list.appendChild(card);
@@ -813,13 +919,15 @@ function selectPersona(idx) {
   renderPersonaList();
   updatePersonaDisplay();
   saveSettings();
-  toast(`เลือกตัวละคร "${state.currentPersona.name}" แล้ว ✨`, 'success');
+  toast(`เลือกตัวละคร "${state.currentPersona.name}" แล้ว`, 'success');
   switchPanel('chat', document.querySelector('[data-panel="chat"]'));
 }
 
 function updatePersonaDisplay() {
   const p = state.currentPersona;
-  document.getElementById('persona-avatar-display').textContent = p?.emoji || '🎭';
+  const avatarEl = document.getElementById('persona-avatar-display');
+  const DEFAULT_PERSONA_ICON = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>';
+  avatarEl.innerHTML = p?.emoji ? `<span style="font-size:32px;line-height:1">${p.emoji}</span>` : DEFAULT_PERSONA_ICON;
   document.getElementById('persona-name-display').textContent = p?.name || 'ยังไม่ได้เลือก';
   document.getElementById('persona-desc-display').textContent = p?.desc || 'กรุณาเลือกตัวละครใน Tab ตัวละคร';
 }
@@ -836,7 +944,7 @@ function startNewPersona() {
   document.getElementById('pe-hk-sad').value = '';
   document.getElementById('pe-hk-excited').value = '';
   document.getElementById('pe-hk-angry').value = '';
-  document.getElementById('persona-editor-title').textContent = '➕ เพิ่มตัวละครใหม่';
+  document.getElementById('persona-editor-title').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> เพิ่มตัวละครใหม่';
   document.getElementById('btn-delete-persona').style.display = 'none';
   document.getElementById('persona-editor').style.display = 'block';
   document.getElementById('persona-editor').scrollIntoView({ behavior: 'smooth' });
@@ -853,7 +961,7 @@ function editPersona(idx) {
   document.getElementById('pe-hk-sad').value = p.hotkeys?.sad || '';
   document.getElementById('pe-hk-excited').value = p.hotkeys?.excited || '';
   document.getElementById('pe-hk-angry').value = p.hotkeys?.angry || '';
-  document.getElementById('persona-editor-title').textContent = '✏️ แก้ไขตัวละคร';
+  document.getElementById('persona-editor-title').innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> แก้ไขตัวละคร';
   document.getElementById('btn-delete-persona').style.display = 'inline-flex';
   document.getElementById('persona-editor').style.display = 'block';
   document.getElementById('persona-editor').scrollIntoView({ behavior: 'smooth' });
@@ -883,7 +991,7 @@ function savePersona() {
   document.getElementById('persona-editor').style.display = 'none';
   renderPersonaList();
   saveSettings();
-  toast(`บันทึกตัวละคร "${name}" แล้ว ✨`, 'success');
+  toast(`บันทึกตัวละคร "${name}" แล้ว`, 'success');
 }
 
 function deletePersona() {

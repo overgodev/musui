@@ -3,12 +3,57 @@ const path = require('path');
 const WebSocket = require('ws');
 const axios = require('axios');
 const { exec } = require('child_process');
+const { execFile } = require('child_process');
 const fs = require('fs');
+const os = require('os');
 
 let mainWindow;
 let vtubeWs = null;
 let vtubeAuthenticated = false;
 let currentSettings = {};
+
+const EDGE_RVC_DEFAULTS = Object.freeze({
+  voice: 'th-TH-PremwadeeNeural',
+  rate: '+3%',
+  pitch: '+60Hz',
+  volume: '+6%',
+  f0method: 'harvest',
+  indexRate: 0.9,
+  protect: 0.28,
+  rmsMixRate: 0.9,
+  filterRadius: 3,
+  resampleSr: 0,
+});
+
+function clamp01(value, fallback = 0) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  if (n < 0) return 0;
+  if (n > 1) return 1;
+  return n;
+}
+
+function toInt(value, fallback = 0) {
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.trunc(n) : fallback;
+}
+
+function resolveRvcPython() {
+  const localVenv = path.join(__dirname, '..', '.venv310_rvc', 'Scripts', 'python.exe');
+  if (fs.existsSync(localVenv)) return localVenv;
+  if (process.env.RVC_PYTHON && fs.existsSync(process.env.RVC_PYTHON)) return process.env.RVC_PYTHON;
+  return 'python';
+}
+
+function resolveEdgeVoiceParams(text, opts = {}) {
+  const hasThai = /[\u0E00-\u0E7F]/.test(text || '');
+  return {
+    voice: (opts.voice || '').trim() || (hasThai ? EDGE_RVC_DEFAULTS.voice : 'en-US-JennyNeural'),
+    rate: (opts.rate || '').trim() || EDGE_RVC_DEFAULTS.rate,
+    pitch: (opts.pitch || '').trim() || EDGE_RVC_DEFAULTS.pitch,
+    volume: (opts.volume || '').trim() || EDGE_RVC_DEFAULTS.volume,
+  };
+}
 
 // ─── Create Window ─────────────────────────────────────────────────────────
 function createWindow() {
@@ -279,6 +324,170 @@ ipcMain.handle('tts-stop', async () => {
   const say = require('say');
   say.stop();
   return { success: true };
+});
+
+ipcMain.handle('rvc-speak', async (event, opts = {}) => {
+  const {
+    text,
+    runtime,
+    rvcUrl,
+    pitch,
+    modelName,
+    modelPath,
+    indexPath,
+    edgeVoice,
+    edgeRate,
+    edgePitch,
+    edgeVolume,
+    f0method,
+    indexRate,
+    protect,
+    rmsMixRate,
+    filterRadius,
+    resampleSr,
+  } = opts;
+
+  const timestamp = Date.now();
+  const srcWav = path.join(os.tmpdir(), `tts_src_${timestamp}.wav`);
+  const outWav = path.join(os.tmpdir(), `rvc_out_${timestamp}.wav`);
+  const cleanText = String(text || '').replace(/\s+/g, ' ').trim().substring(0, 500);
+  const pythonCmd = resolveRvcPython();
+
+  try {
+    if (!cleanText) throw new Error('Text is empty');
+    const edgeParams = resolveEdgeVoiceParams(cleanText, {
+      voice: edgeVoice,
+      rate: edgeRate,
+      pitch: edgePitch,
+      volume: edgeVolume,
+    });
+
+    const useLocalCpu = String(runtime || '').toLowerCase() === 'local-cpu';
+    if (useLocalCpu) {
+      if (!modelPath || !fs.existsSync(modelPath)) {
+        throw new Error('Local CPU mode requires a valid .pth model path');
+      }
+      const helperScript = path.join(__dirname, 'rvc_local_cpu_tts_helper.py');
+      const helperArgs = [
+        helperScript,
+        cleanText,
+        outWav,
+        `--model-path=${modelPath}`,
+        `--voice=${edgeParams.voice}`,
+        `--rate=${edgeParams.rate}`,
+        `--edge-pitch=${edgeParams.pitch}`,
+        `--volume=${edgeParams.volume}`,
+        `--rvc-pitch=${toInt(pitch, 0)}`,
+        `--f0method=${(typeof f0method === 'string' && f0method.trim()) || EDGE_RVC_DEFAULTS.f0method}`,
+        `--index-rate=${clamp01(indexRate, EDGE_RVC_DEFAULTS.indexRate)}`,
+        `--protect=${clamp01(protect, EDGE_RVC_DEFAULTS.protect)}`,
+        `--rms-mix-rate=${clamp01(rmsMixRate, EDGE_RVC_DEFAULTS.rmsMixRate)}`,
+      ];
+      if (indexPath && fs.existsSync(indexPath)) helperArgs.push(`--index-path=${indexPath}`);
+
+      await new Promise((resolve, reject) => {
+        execFile(pythonCmd, helperArgs, { timeout: 180000 }, (err) => {
+          if (err) reject(new Error('local cpu rvc failed: ' + err.message));
+          else resolve();
+        });
+      });
+
+      if (!fs.existsSync(outWav)) throw new Error('Local CPU RVC produced no output file');
+      return { success: true, audioPath: outWav };
+    }
+
+    if (!rvcUrl) throw new Error('RVC server URL is required');
+
+    const helperScript = path.join(__dirname, 'rvc_tts_helper.py');
+    const helperArgs = [
+      helperScript,
+      cleanText,
+      srcWav,
+      `--voice=${edgeParams.voice}`,
+      `--rate=${edgeParams.rate}`,
+      `--pitch=${edgeParams.pitch}`,
+      `--volume=${edgeParams.volume}`,
+    ];
+
+    await new Promise((resolve, reject) => {
+      execFile(pythonCmd, helperArgs, { timeout: 30000 }, (err) => {
+        if (err) reject(new Error('edge-tts failed: ' + err.message));
+        else resolve();
+      });
+    });
+
+    if (!fs.existsSync(srcWav)) throw new Error('edge-tts produced no output file');
+
+    const form = new FormData();
+    const wavBuf = fs.readFileSync(srcWav);
+    form.append('files', new Blob([wavBuf], { type: 'audio/wav' }), 'input.wav');
+
+    const uploadResp = await fetch(`${rvcUrl}/upload`, { method: 'POST', body: form });
+    if (!uploadResp.ok) throw new Error(`RVC upload failed: ${uploadResp.status}`);
+    const uploadData = await uploadResp.json();
+
+    let uploadedPath = '';
+    if (Array.isArray(uploadData) && uploadData.length > 0) {
+      const first = uploadData[0];
+      uploadedPath = typeof first === 'string' ? first : (first.path || first.name || first.tmp_path || '');
+    }
+    if (!uploadedPath) throw new Error('RVC upload returned no file path');
+
+    if (modelName) {
+      await fetch(`${rvcUrl}/run/infer_change_voice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: [modelName, 0.33, 0.33] }),
+      });
+    }
+
+    const inferResp = await fetch(`${rvcUrl}/run/infer_convert`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: [
+          0,
+          uploadedPath,
+          toInt(pitch, 0),
+          null,
+          (typeof f0method === 'string' && f0method.trim()) || EDGE_RVC_DEFAULTS.f0method,
+          '',
+          '',
+          clamp01(indexRate, EDGE_RVC_DEFAULTS.indexRate),
+          toInt(filterRadius, EDGE_RVC_DEFAULTS.filterRadius),
+          toInt(resampleSr, EDGE_RVC_DEFAULTS.resampleSr),
+          clamp01(rmsMixRate, EDGE_RVC_DEFAULTS.rmsMixRate),
+          clamp01(protect, EDGE_RVC_DEFAULTS.protect),
+        ],
+      }),
+    });
+    if (!inferResp.ok) throw new Error(`RVC infer failed: ${inferResp.status}`);
+
+    const inferJson = await inferResp.json();
+    const resultData = inferJson?.data;
+    if (!Array.isArray(resultData) || resultData.length < 2) {
+      throw new Error(`infer_convert response invalid: ${JSON.stringify(resultData).substring(0, 200)}`);
+    }
+
+    const audioOutput = resultData[1];
+    const audioFilePath = typeof audioOutput === 'string'
+      ? audioOutput
+      : (audioOutput?.path || audioOutput?.name || '');
+    if (!audioFilePath) throw new Error('Cannot read audio path from RVC response');
+
+    const audioResp = await fetch(`${rvcUrl}/file=${audioFilePath}`);
+    if (!audioResp.ok) throw new Error(`RVC file fetch failed: ${audioResp.status}`);
+    const audioBuffer = Buffer.from(await audioResp.arrayBuffer());
+    fs.writeFileSync(outWav, audioBuffer);
+
+    try { fs.unlinkSync(srcWav); } catch {}
+    return { success: true, audioPath: outWav };
+  } catch (err) {
+    try { fs.unlinkSync(srcWav); } catch {}
+    try { fs.unlinkSync(outWav); } catch {}
+    console.error('rvc-speak error:', err.message);
+    return { success: false, error: err.message };
+  }
 });
 
 // ─── File Dialog (for .pth model) ──────────────────────────────────────────
