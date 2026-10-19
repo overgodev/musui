@@ -24,3 +24,14 @@ def test_flags_parasocial_bait() -> None:
     result = service.classify("รักหนูไหม มีแต่ฉันได้ไหม")
     assert ModerationLabel.parasocial_bait in result.labels
     assert result.action == Action.soft_refuse
+
+
+
+def test_no_false_positives_on_everyday_chat() -> None:
+    service = ModerationService("infra/moderation/rules.yaml")
+    # "nc" inside a word, ปะทะ (ปะ was rewritten to เปล่า), and just mentioning school
+    for text in ["once upon a time", "sync กันหน่อย", "ปะทะกัน", "โรงเรียนเปิดพรุ่งนี้"]:
+        assert service.classify(text).action == Action.allow, text
+    assert ModerationLabel.sexual in service.classify("ดู nc ไหม").labels
+    assert ModerationLabel.doxxing in service.classify("อยู่โรงเรียนไหน").labels
+    assert ModerationLabel.doxxing in service.classify("เบอร์0812345678").labels
